@@ -1,0 +1,187 @@
+<style type="text/css" media="screen">
+    /* Put your CSS styling here */
+    .section {
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 50px;
+        padding-bottom: 50px;
+        width: 930px;
+        font-size: 15px;
+    }
+    thead {
+        background-color: #FFC000;
+        font-weight: bold;
+        text-align: center;
+    }
+    .report-header {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 50px;
+    }
+    table {
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+
+<script type="text/javascript">
+
+    // Put your javascript functions here 
+
+    $(document).ready(function () {
+        var date = new Date(dhis2.report.date);
+        var orgUnit = dhis2.report.organisationUnit;
+        var today = new Date();   
+
+        console.log(date);
+        console.log(orgUnit);
+        // var orgUnit = dhis2.report.organisationUnit;
+            $("#orgUnit").html(orgUnit.name);
+            $("#date").html(date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear());
+            $("#today").html(today);
+            var fullYear = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var quarter = getQuarter(month);
+            var period = fullYear+quarter;
+            $.get("../api/analytics?dimension=dx:ourMr6BHOFF;TN3hkdipKgL;x1R3Np8VFN3;eIcj1ftb0do;A5F0Rwi0q57;Q6IvIXfzL5j;rQh5WmAPagE;S9NqU7RXfNP;SyueHlWSAyi;GPWY6uNp4Q9&dimension=pe:"+period+"&filter=ou:" + orgUnit.id, function (json) {
+                    $("#areaI").html(json.rows[0][2]);
+                    $("#areaIScore").html(score(json.rows[0][2]));
+                    $("#areaII").html(json.rows[1][2]);
+                    $("#areaIIScore").html(score(json.rows[1][2]));
+                    $("#areaIII").html(json.rows[2][2]);
+                    $("#areaIIIScore").html(score(json.rows[2][2]));
+                    $("#areaIV").html(json.rows[3][2]);
+                    $("#areaIVScore").html(score(json.rows[3][2]));
+                    $("#areaV").html(json.rows[4][2]);
+                    $("#areaVScore").html(score(json.rows[4][2]));
+                    $("#areaVI").html(json.rows[5][2]);
+                    $("#areaVIScore").html(score(json.rows[5][2]));
+                    $("#areaVII").html(json.rows[6][2]);
+                    $("#areaVIIScore").html(score(json.rows[6][2]));
+                    $("#areaVIII").html(json.rows[7][2]);
+                    $("#areaVIIIScore").html(score(json.rows[7][2]));
+                    $("#areaIX").html(json.rows[8][2]);
+                    $("#areaIXScore").html(score(json.rows[8][2]));
+                    $("#areaX").html(json.rows[9][2]);
+                    $("#areaXScore").html(score(json.rows[9][2]));
+                });
+
+        $("#table1").load("../api/reportTables/ODstImmMZTq/data.html?date=" + date);
+
+    });
+    function getQuarter(month) {
+        if(month == 1 || month == 2 || month == 3){
+            return 'Q1';
+        }else if(month == 4 || month == 5 || month == 6){
+            return 'Q2';
+        }else if(month == 7 || month == 8 || month == 9){
+            return 'Q3';
+        }else if(month == 10 || month == 11 || month == 12){
+            return 'Q4';
+        }
+    }
+    function score(areaValue) {
+        if (areaValue >= 80) {
+            return "Bom";
+        } else if (areaValue >= 60) {
+            return "Médio";
+        } else {
+            return "Mau";
+        }
+    }
+</script>
+
+<div>
+
+    <!-- Put your HTML mark-up here -->
+    <header class="report-header">
+        <img src="http://nuvem.jembi.org:44981/api/documents/gAtyR6qt1eC/data" height="80px" alt="Emblema">
+        <p>República De Moçambique</p>
+        <hr>
+        <p>Ministério Da Saúde</p>
+        <p>Percentagem de áreas de desempenho de cuidados pós VBG alcançados por US</p>
+    </header>
+
+    <p style="margin-left: 70px;">
+        <b>Período de Avaliação:</b><span id="date"></span>      
+    </p>
+    <p  style="margin-left: 70px;">
+        <b>Local: </b> <span id="orgUnit"></span>            
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Área</th>
+                <th colspan="2">Desempenho</th>
+            </tr>
+            <tr>
+                <th>10 Áreas</th>
+                <th>%</th>
+                <th>(&gt;=80% "Bom") | (79%-60% "Médio") | (&lt;60% "Mau")</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ri="0">
+                <td rv="I. Disponibilidade de cuidados pós VBG ">
+                    I. Disponibilidade de cuidados pós VBG </td>
+                <td rv="------"><span id="areaI"></span>&nbsp;&#37;</td>
+                <td rv="------"><span id="areaIScore"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="II. Materiais e Infraestruturas ">
+                    II. Materiais e Infraestruturas </td>
+                <td rv="------"><span id="areaII"></span>&nbsp;&#37;</td>
+                <td rv="------"><span id="areaIIScore"></span></td>
+            </tr>
+            <tr ri="2">
+                <td rv="III. Identificação Precoce de Vítimas de Violência  ">
+                    III. Identificação Precoce de Vítimas de Violência </td>
+                <td rv="------"><span id="areaIII"></span>&nbsp;&#37;</td>
+                <td rv="------"><span id="areaIIIScore"></span></td>
+            </tr>
+            <tr ri="3">
+                <td rv="IV. Cuidados Clí&shy;nicos Centrados no Utente">
+                    IV. Cuidados Clí&shy;nicos Centrados no Utente </td>
+                <td rv="------"><span id="areaIV"></span>&nbsp;&#37;</td>
+                <td rv="------"><span id="areaIVScore"></span></td>
+            </tr>
+            <tr ri="4">
+                <td rv="V. Medicina Legal">
+                    V. Medicina Legal </td>
+                <td rv="------"><span id="areaV"></span>&nbsp;&#37;</td>
+                <td rv="------"><span id="areaVScore"></span></td>
+            </tr>
+            <tr ri="5">
+                <td rv="VI. Sistema de Referência e Seguimento da Vítima ">
+                    VI. Sistema de Referência e Seguimento da Vítima </td>
+                <td rv="------"><span id="areaVI"></span>&nbsp;&#37;</td>
+                <td rv="------"><span id="areaVIScore"></span></td>
+            </tr>
+            <tr ri="6">
+                <td rv="VII. Formação e Melhoria de Qualidade ">
+                    VII. Formação e Melhoria de Qualidade </td>
+                <td rv="------"><span id="areaVII"></span>&nbsp;&#37;</td>
+                <td rv="------"><span id="areaVIIScore"></span></td>
+            </tr>
+            <tr ri="7">
+                <td rv="VIII. Politicas de Cuidados de Saúde">
+                    VIII. Politicas de Cuidados de Saúde </td>
+                <td rv="------"><span id="areaVIII"></span>&nbsp;&#37;</td>
+                <td rv="------"><span id="areaVIIIScore"></span></td>
+            </tr>
+            <tr ri="8">
+                <td rv="IX. Criação de Demanda Para Uso de Cuidados Pos Violência ">
+                    IX. Criação de Demanda Para Uso de Cuidados Pos Violência </td>
+                <td rv="------"><span id="areaIX"></span>&nbsp;&#37;</td>
+                <td rv="------"><span id="areaIXScore"></span></td>
+            </tr>
+            <tr ri="9">
+                <td rv="X. Reporte e Sistemas de Informação ">
+                    X. Reporte e Sistemas de Informação </td>
+                <td rv="------"><span id="areaX"></span>&nbsp;&#37;</td>
+                <td rv="------"><span id="areaXScore"></span></td>
+            </tr>
+        </tbody>
+    </table>
+    <p  style="margin-left: 70px;"><b>Data de Geração:</b><span id="today"></span></p>
+</div>

@@ -1,0 +1,31 @@
+<style type="text/css" media="screen">
+    /* Put your CSS styling here */
+</style>
+
+<script type="text/javascript">
+
+    // Put your javascript functions here 
+
+    $(document).ready( function() {
+        var date = dhis2.report.date;
+        console.log(date);
+        console.log("Kelvin Murumba");
+
+        $("#table1").load("../api/reportTables/wjSplEkLewz/data.html?date=" + date);
+
+    });
+</script>
+
+<div>
+
+    <!-- Put your HTML mark-up here -->
+    <header class="report-header">
+        <p>República De Moçambique</p>
+        <hr>
+        <p>Ministério Da Saúde</p>
+        <p>Percentagem de áreas de desempenho de cuidados pós VBG alcançados por US</p>
+    </header>
+
+    <div class="section" id="table1"></div>
+
+</div>
