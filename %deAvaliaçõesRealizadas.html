@@ -1,31 +1,114 @@
 <style type="text/css" media="screen">
     /* Put your CSS styling here */
+    thead {
+        background-color: #FFC000;
+        font-weight: bold;
+        text-align: center;
+    }
+    .report-header {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 50px;
+    }
+    table {
+        margin-left: auto;
+        margin-right: auto;
+    }
 </style>
 
 <script type="text/javascript">
 
     // Put your javascript functions here 
 
-    $(document).ready( function() {
-        var date = dhis2.report.date;
-        console.log(date);
-        console.log("Kelvin Murumba");
+    $(document).ready(function () {
+        var date = new Date(dhis2.report.date);
+        var orgUnit = dhis2.report.organisationUnit;
+        var today = new Date();  
 
-        $("#table1").load("../api/reportTables/wjSplEkLewz/data.html?date=" + date);
+        $("#orgUnit").html(orgUnit.name);
+        $("#date").html(date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear());
+        $("#today").html(today);
+        var fullYear = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var quarter = getQuarter(month);
+        var period = fullYear+quarter;
+        $.get("../api/analytics?dimension=dx:yOR81tRBWIw;u7P0opGH3c9;lD2YLTZ8NOe;QYYFkIdTTDY;vA3Y0Bzy4sU;hV52rtgvgEI&dimension=pe:"+period+"&filter=ou:" + orgUnit.id, function (json) {
+                    $("#baseline").html(json.rows[0][2]);
+                    $("#internal").html(json.rows[1][2]);
+                    $("#external").html(json.rows[2][2]);
+                    $("#total").html(json.rows[3][2]);
+                    $("#validEvaluations").html(json.rows[4][2]);
+                    $("#validEvaluations2").html(json.rows[5][2]);
+                });
+
+        // console.log(date);
+        // console.log("Kelvin Murumba");
+
+        // $("#table1").load("../api/reportTables/wjSplEkLewz/data.html?date=" + date);
 
     });
+    function getQuarter(month) {
+        if(month == 1 || month == 2 || month == 3){
+            return 'Q1';
+        }else if(month == 4 || month == 5 || month == 6){
+            return 'Q2';
+        }else if(month == 7 || month == 8 || month == 9){
+            return 'Q3';
+        }else if(month == 10 || month == 11 || month == 12){
+            return 'Q4';
+        }
+    }
 </script>
 
 <div>
 
     <!-- Put your HTML mark-up here -->
     <header class="report-header">
+        <img src="http://nuvem.jembi.org:44981/api/documents/gAtyR6qt1eC/data" height="80px" alt="Emblema">
         <p>República De Moçambique</p>
         <hr>
         <p>Ministério Da Saúde</p>
         <p>Percentagem de áreas de desempenho de cuidados pós VBG alcançados por US</p>
     </header>
 
-    <div class="section" id="table1"></div>
-
+    <!-- <div class="section" id="table1"></div> -->
+    <p style="margin-left: 70px;">
+        <b>Período de Avaliação:</b><span id="date"></span>      
+    </p>
+    <p  style="margin-left: 70px;">
+        <b>Local: </b> <span id="orgUnit"></span>            
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th colspan="3">Tipo de Avalição</th>
+                <th rowspan="2">Total</th>
+                <th colspan="2">Avaliações Esperadas</th>
+                <th colspan="2">Avaliações Realizadas a tempo</th>
+            </tr>
+            <tr>
+                <th>Linha de Base</th>
+                <th>Interna</th>
+                <th>Externa</th>
+                <th>Nº</th>
+                <th>%</th>
+                <th>Nº </th>
+                <th>% </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ri="0">
+                <td rv="0"><span id="baseline"></span></td>
+                <td rv="1"><span id="internal"></span></td>
+                <td rv="0"><span id="external"></span></td>
+                <td rv="1"><span id="total"></span></td>
+                <td rv="1">1</td>
+                <td rv="100">100%</td>
+                <td rv="0"><span id="validEvaluations"></span></td>
+                <td rv="0"><span id="validEvaluations2"></span>&nbsp;&#37;</td>
+            </tr>
+        </tbody>
+    </table>
+    <p  style="margin-left: 70px;"><b>Data de Geração:</b><span id="today"></span></p>
 </div>
