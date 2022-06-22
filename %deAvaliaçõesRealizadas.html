@@ -5,12 +5,14 @@
         font-weight: bold;
         text-align: center;
     }
+
     .report-header {
         text-align: center;
         font-size: 20px;
         font-weight: bold;
         margin-bottom: 50px;
     }
+
     table {
         margin-left: auto;
         margin-right: auto;
@@ -24,7 +26,9 @@
     $(document).ready(function () {
         var date = new Date(dhis2.report.date);
         var orgUnit = dhis2.report.organisationUnit;
-        var today = new Date();  
+        var today = new Date();
+
+        console.log(orgUnit);
 
         $("#orgUnit").html(orgUnit.name);
         $("#date").html(date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear());
@@ -32,33 +36,115 @@
         var fullYear = date.getFullYear();
         var month = date.getMonth() + 1;
         var quarter = getQuarter(month);
-        var period = fullYear+quarter;
-        $.get("../api/analytics?dimension=dx:yOR81tRBWIw;u7P0opGH3c9;lD2YLTZ8NOe;QYYFkIdTTDY;vA3Y0Bzy4sU;hV52rtgvgEI&dimension=pe:"+period+"&filter=ou:" + orgUnit.id, function (json) {
+        var period = fullYear + quarter;
+
+        //Get organisation unit and check the level
+        $.get("../api/organisationUnits/" + orgUnit.id + ".json?fields=id,name,level,children", function (json) {
+            var level = json.level;
+            if (level == 1) {
+                console.log(json.children);
+                // $.get("../api/analytics?dimension=dx:ourMr6BHOFF;TN3hkdipKgL;x1R3Np8VFN3;eIcj1ftb0do;A5F0Rwi0q57;Q6IvIXfzL5j;rQh5WmAPagE;S9NqU7RXfNP;SyueHlWSAyi;GPWY6uNp4Q9&dimension=pe:" + period + "&filter=ou:" + orgUnit.id, function (json) {
+                //     $("#areaI").html(json.rows[0][2]);
+                //     $("#areaIScore").html(score(json.rows[0][2]));
+                //     $("#areaII").html(json.rows[1][2]);
+                // });
+            } else if (level == 2) {
+                console.log(json.children);
+            } else if (level == 3) {
+
+                $.each(json.children, function (index, value) {
+                    let orgUnitName = "";
+                    let baseline = 0;
+                    let internal = 0;
+                    let external = 0;
+                    let total = 0;
+                    let validEvaluations = 0;
+                    let validEvaluations2 = 0;
+                    $.get("../api/organisationUnits/" + value.id + ".json?fields=id,name", function (json) {
+                            orgUnitName = json.name;
+                    });
+
+                    $.get("../api/analytics?dimension=dx:yOR81tRBWIw;u7P0opGH3c9;lD2YLTZ8NOe;QYYFkIdTTDY;vA3Y0Bzy4sU;hV52rtgvgEI&dimension=pe:" + period + "&filter=ou:" + value.id, function (json) {
+                        if(Array.isArray(json.rows) && json.rows.length > 0) {
+                            baseline = json.rows[0][2];
+                            internal = json.rows[1][2];
+                            external = json.rows[2][2];
+                            total = json.rows[3][2];
+                            validEvaluations = json.rows[4][2];
+                            validEvaluations2 = json.rows[5][2];
+                            console.log(json);
+                        }
+                        $('#tblOrgainzationUnits').append('<tr><td>'+ orgUnitName +'</td><td>'+ baseline +'</td> <td>'+ internal +'</td><td>'+ external +'</td> <td>'+ total +'</td> <td>1</td> <td>100%</td> <td>'+ validEvaluations +'</td> <td>'+ validEvaluations2 +'</td></tr>');
+
+                    });
+                });
+
+            } else if (level == 4) {
+                $.get("../api/analytics?dimension=dx:yOR81tRBWIw;u7P0opGH3c9;lD2YLTZ8NOe;QYYFkIdTTDY;vA3Y0Bzy4sU;hV52rtgvgEI&dimension=pe:" + period + "&filter=ou:" + orgUnit.id, function (json) {
                     $("#baseline").html(json.rows[0][2]);
                     $("#internal").html(json.rows[1][2]);
                     $("#external").html(json.rows[2][2]);
                     $("#total").html(json.rows[3][2]);
                     $("#validEvaluations").html(json.rows[4][2]);
                     $("#validEvaluations2").html(json.rows[5][2]);
+                    $("#orgUnit4").html(orgUnit.name);
+
                 });
+                $('#tblOrgainzationUnits').append('<tr><td><span id="orgUnit4"></span></td><td><span id="baseline"></span></td> <td><span id="internal"></span></td><td><span id="external"></span></td> <td><span id="total"></span></td> <td>1</td> <td>100%</td> <td><span id="validEvaluations"></span></td> <td><span id="validEvaluations2"></span></td></tr>');
 
-        // console.log(date);
-        // console.log("Kelvin Murumba");
+            }
 
-        // $("#table1").load("../api/reportTables/wjSplEkLewz/data.html?date=" + date);
 
-    });
-    function getQuarter(month) {
-        if(month == 1 || month == 2 || month == 3){
-            return 'Q1';
-        }else if(month == 4 || month == 5 || month == 6){
-            return 'Q2';
-        }else if(month == 7 || month == 8 || month == 9){
-            return 'Q3';
-        }else if(month == 10 || month == 11 || month == 12){
-            return 'Q4';
+            //if level is 1, then get the children of the organisation unit
+
+            //if level is 2, then get the children of the children of the organisation unit
+
+            //if level is 3, then get the children of the children of the children of the organisation unit
+
+            // if level 4, then get the data for the health facility
+
+
+            // $.get("../api/analytics?dimension=dx:yOR81tRBWIw;u7P0opGH3c9;lD2YLTZ8NOe;QYYFkIdTTDY;vA3Y0Bzy4sU;hV52rtgvgEI&dimension=pe:" + period + "&filter=ou:" + orgUnit.id, function (json) {
+            //     $("#baseline").html(json.rows[0][2]);
+            //     $("#internal").html(json.rows[1][2]);
+            //     $("#external").html(json.rows[2][2]);
+            //     $("#total").html(json.rows[3][2]);
+            //     $("#validEvaluations").html(json.rows[4][2]);
+            //     $("#validEvaluations2").html(json.rows[5][2]);
+            // });
+
+            // console.log(date);
+            // console.log("Kelvin Murumba");
+
+            // $("#table1").load("../api/reportTables/wjSplEkLewz/data.html?date=" + date);
+
+        });
+        function getQuarter(month) {
+            if (month == 1 || month == 2 || month == 3) {
+                return 'Q1';
+            } else if (month == 4 || month == 5 || month == 6) {
+                return 'Q2';
+            } else if (month == 7 || month == 8 || month == 9) {
+                return 'Q3';
+            } else if (month == 10 || month == 11 || month == 12) {
+                return 'Q4';
+            }
         }
-    }
+        function getOrgUnit(orgUnitId) {
+            let results = [];
+            let orgUnit = {};
+            $.getJSON("../api/organisationUnits/"+orgUnitId+".json?fields=id,name,level,children", function (data) {
+                orgUnit.id = data.id;
+                orgUnit.name = data.name;
+                orgUnit.level = data.level;
+                orgUnit.children = data.children;
+                results.push(orgUnit);
+                console.log(results);
+            });
+            return results;
+        }
+    });
+
 </script>
 
 <div>
@@ -69,19 +155,21 @@
         <p>República De Moçambique</p>
         <hr>
         <p>Ministério Da Saúde</p>
-        <p>Percentagem de áreas de desempenho de cuidados pós VBG alcançados por US</p>
+        <p>Percentagem de US com avaliações realizadas</p>
     </header>
 
     <!-- <div class="section" id="table1"></div> -->
     <p style="margin-left: 70px;">
-        <b>Período de Avaliação:</b><span id="date"></span>      
+        <b>Período de Avaliação:</b><span id="date"></span>
     </p>
-    <p  style="margin-left: 70px;">
-        <b>Local: </b> <span id="orgUnit"></span>            
+    <p style="margin-left: 70px;">
+        <b>Local: </b> <span id="orgUnit"></span>
+        <b>Local: </b> <span id="orgUnitTest"></span>
     </p>
     <table class="table">
         <thead>
             <tr>
+                <th rowspan="3">Unidade Sanitária</th>
                 <th colspan="3">Tipo de Avalição</th>
                 <th rowspan="2">Total</th>
                 <th colspan="2">Avaliações Esperadas</th>
@@ -97,18 +185,31 @@
                 <th>% </th>
             </tr>
         </thead>
-        <tbody>
-            <tr ri="0">
-                <td rv="0"><span id="baseline"></span></td>
-                <td rv="1"><span id="internal"></span></td>
-                <td rv="0"><span id="external"></span></td>
-                <td rv="1"><span id="total"></span></td>
-                <td rv="1">1</td>
-                <td rv="100">100%</td>
-                <td rv="0"><span id="validEvaluations"></span></td>
-                <td rv="0"><span id="validEvaluations2"></span>&nbsp;&#37;</td>
-            </tr>
+        <tbody id="tblOrgainzationUnits">
+
         </tbody>
+        <tfoot>
+            <tr>
+                <td>
+                    Total </td>
+                <td>
+                    0 </td>
+                <td>
+                    1 </td>
+                <td>
+                    0 </td>
+                <td>
+                    1 </td>
+                <td>
+                    8 </td>
+                <td>
+                    13% </td>
+                <td>
+                    0 </td>
+                <td>
+                    0% </td>
+            </tr>
+        </tfoot>
     </table>
-    <p  style="margin-left: 70px;"><b>Data de Geração:</b><span id="today"></span></p>
+    <p style="margin-left: 70px;"><b>Data de Geração:</b><span id="today"></span></p>
 </div>
