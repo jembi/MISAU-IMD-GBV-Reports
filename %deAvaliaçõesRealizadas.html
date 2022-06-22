@@ -5,7 +5,8 @@
         font-weight: bold;
         text-align: center;
     }
-    tfoot{
+
+    tfoot {
         font-weight: bold;
     }
 
@@ -45,68 +46,11 @@
         $.get("../api/organisationUnits/" + orgUnit.id + ".json?fields=id,name,level,children", function (json) {
             var level = json.level;
             if (level == 1) {
-                console.log(json.children);
-                // $.get("../api/analytics?dimension=dx:ourMr6BHOFF;TN3hkdipKgL;x1R3Np8VFN3;eIcj1ftb0do;A5F0Rwi0q57;Q6IvIXfzL5j;rQh5WmAPagE;S9NqU7RXfNP;SyueHlWSAyi;GPWY6uNp4Q9&dimension=pe:" + period + "&filter=ou:" + orgUnit.id, function (json) {
-                //     $("#areaI").html(json.rows[0][2]);
-                //     $("#areaIScore").html(score(json.rows[0][2]));
-                //     $("#areaII").html(json.rows[1][2]);
-                // });
+                getReportDetails(json.children, period);
             } else if (level == 2) {
-                console.log(json.children);
+                getReportDetails(json.children, period);
             } else if (level == 3) {
-                    let orgUnitName = "";
-                    let baseline = 0;
-                    let internal = 0;
-                    let external = 0;
-                    let total = 0;
-                    let validEvaluations = 0;
-                    let validEvaluationsPercentage = 0;
-                    let baselineSum = 0;
-                    let internalSum = 0;
-                    let externalSum = 0;
-                    let totalSum = 0;
-                    let exepectedEvaluationSum = 0;
-                    let exepectedEvaluationSumPercentage = 0;
-                    let validEvaluationsSum = 0;
-                    let validEvaluationSumPercentage = 0;
-                $.each(json.children, function (index, value) {
-                    $.get("../api/organisationUnits/" + value.id + ".json?fields=id,name", function (json) {
-                            orgUnitName = json.name;
-                    });
-
-                    $.get("../api/analytics?dimension=dx:yOR81tRBWIw;u7P0opGH3c9;lD2YLTZ8NOe;QYYFkIdTTDY;vA3Y0Bzy4sU;hV52rtgvgEI&dimension=pe:" + period + "&filter=ou:" + value.id, function (json) {
-                        if(Array.isArray(json.rows) && json.rows.length > 0) {
-                            baseline = json.rows[0][2];
-                            internal = json.rows[1][2];
-                            external = json.rows[2][2];
-                            total = json.rows[3][2];
-                            validEvaluations = json.rows[4][2];
-                            validEvaluationsPercentage = json.rows[5][2];
-
-                        }
-                        baselineSum = parseInt(baselineSum) + parseInt(baseline);
-                        internalSum = parseInt(internalSum) + parseInt(internal);
-                        externalSum = parseInt(externalSum) + parseInt(external);
-                        totalSum = parseInt(totalSum) + parseInt(total);
-                        exepectedEvaluationSum = parseInt(exepectedEvaluationSum) + parseInt(1)
-                        exepectedEvaluationSumPercentage = '100%';
-                        validEvaluationsSum = parseInt(validEvaluationsSum) + parseInt(validEvaluations);
-                        validEvaluationSumPercentage = 0;
-                        $("#baselineSum").html(baselineSum);
-                        $("#internalSum").html(internalSum);
-                        $("#externalSum").html(externalSum);
-                        $("#totalSum").html(totalSum);
-                        $("#exepectedEvaluationSum").html(exepectedEvaluationSum);
-                        $("#exepectedEvaluationSumPercentage").html(exepectedEvaluationSumPercentage);
-                        $("#validEvaluationsSum").html(validEvaluationsSum);
-                        $("#validEvaluationSumPercentage").html(validEvaluationSumPercentage);
-                        $('#tblOrgainzationUnits').append('<tr><td>'+ orgUnitName +'</td><td>'+ baseline +'</td> <td>'+ internal +'</td><td>'+ external +'</td> <td>'+ total +'</td> <td>1</td> <td>100%</td> <td>'+ validEvaluations +'</td> <td>'+ validEvaluationsPercentage +'</td></tr>');
-
-                    });
-                });
-                $('#tblTotal').append('<tr><td>Total</td><td><span id="baselineSum"></span></td><td><span id="internalSum"></span></td><td><span id="externalSum"></span></td> <td><span id="totalSum"></span></td> <td><span id="exepectedEvaluationSum"></span></td> <td>100%</td> <td><span id="validEvaluationsSum"></span></td> <td><span id="validEvaluationSumPercentage"></span></td></tr>');
-                console.log(baselineSum);
-
+                getReportDetails(json.children, period);
             } else if (level == 4) {
                 $.get("../api/analytics?dimension=dx:yOR81tRBWIw;u7P0opGH3c9;lD2YLTZ8NOe;QYYFkIdTTDY;vA3Y0Bzy4sU;hV52rtgvgEI&dimension=pe:" + period + "&filter=ou:" + orgUnit.id, function (json) {
                     $("#baseline").html(json.rows[0][2]);
@@ -161,7 +105,7 @@
         function getOrgUnit(orgUnitId) {
             let results = [];
             let orgUnit = {};
-            $.getJSON("../api/organisationUnits/"+orgUnitId+".json?fields=id,name,level,children", function (data) {
+            $.getJSON("../api/organisationUnits/" + orgUnitId + ".json?fields=id,name,level,children", function (data) {
                 orgUnit.id = data.id;
                 orgUnit.name = data.name;
                 orgUnit.level = data.level;
@@ -170,7 +114,60 @@
                 console.log(results);
             });
             return results;
+        }
 
+        function getReportDetails(orgUnits, period) {
+            let orgUnitName = "";
+            let baseline = 0;
+            let internal = 0;
+            let external = 0;
+            let total = 0;
+            let validEvaluations = 0;
+            let validEvaluationsPercentage = 0;
+            let baselineSum = 0;
+            let internalSum = 0;
+            let externalSum = 0;
+            let totalSum = 0;
+            let exepectedEvaluationSum = 0;
+            let exepectedEvaluationSumPercentage = 0;
+            let validEvaluationsSum = 0;
+            let validEvaluationSumPercentage = 0;
+            $.each(orgUnits, function (index, value) {
+                $.get("../api/organisationUnits/" + value.id + ".json?fields=id,name", function (json) {
+                    orgUnitName = json.name;
+                });
+
+                $.get("../api/analytics?dimension=dx:yOR81tRBWIw;u7P0opGH3c9;lD2YLTZ8NOe;QYYFkIdTTDY;vA3Y0Bzy4sU;hV52rtgvgEI&dimension=pe:" + period + "&filter=ou:" + value.id, function (json) {
+                    if (Array.isArray(json.rows) && json.rows.length > 0) {
+                        baseline = json.rows[0][2];
+                        internal = json.rows[1][2];
+                        external = json.rows[2][2];
+                        total = json.rows[3][2];
+                        validEvaluations = json.rows[4][2];
+                        validEvaluationsPercentage = json.rows[5][2];
+
+                    }
+                    baselineSum = parseInt(baselineSum) + parseInt(baseline);
+                    internalSum = parseInt(internalSum) + parseInt(internal);
+                    externalSum = parseInt(externalSum) + parseInt(external);
+                    totalSum = parseInt(totalSum) + parseInt(total);
+                    exepectedEvaluationSum = parseInt(exepectedEvaluationSum) + parseInt(1)
+                    exepectedEvaluationSumPercentage = '100%';
+                    validEvaluationsSum = parseInt(validEvaluationsSum) + parseInt(validEvaluations);
+                    validEvaluationSumPercentage = 0;
+                    $("#baselineSum").html(baselineSum);
+                    $("#internalSum").html(internalSum);
+                    $("#externalSum").html(externalSum);
+                    $("#totalSum").html(totalSum);
+                    $("#exepectedEvaluationSum").html(exepectedEvaluationSum);
+                    $("#exepectedEvaluationSumPercentage").html(exepectedEvaluationSumPercentage);
+                    $("#validEvaluationsSum").html(validEvaluationsSum);
+                    $("#validEvaluationSumPercentage").html(validEvaluationSumPercentage);
+                    $('#tblOrgainzationUnits').append('<tr><td>' + orgUnitName + '</td><td>' + baseline + '</td> <td>' + internal + '</td><td>' + external + '</td> <td>' + total + '</td> <td>1</td> <td>100%</td> <td>' + validEvaluations + '</td> <td>' + validEvaluationsPercentage + '</td></tr>');
+
+                });
+            });
+            $('#tblTotal').append('<tr><td>Total</td><td><span id="baselineSum"></span></td><td><span id="internalSum"></span></td><td><span id="externalSum"></span></td> <td><span id="totalSum"></span></td> <td><span id="exepectedEvaluationSum"></span></td> <td>100%</td> <td><span id="validEvaluationsSum"></span></td> <td><span id="validEvaluationSumPercentage"></span></td></tr>');
         }
     });
 
@@ -217,26 +214,6 @@
 
         </tbody>
         <tfoot id="tblTotal">
-            <!-- <tr>
-                <td>
-                    Total </td>
-                <td>
-                    0 </td>
-                <td>
-                    1 </td>
-                <td>
-                    0 </td>
-                <td>
-                    1 </td>
-                <td>
-                    8 </td>
-                <td>
-                    13% </td>
-                <td>
-                    0 </td>
-                <td>
-                    0% </td>
-            </tr> -->
         </tfoot>
     </table>
     <p style="margin-left: 70px;"><b>Data de Geração:</b><span id="today"></span></p>
