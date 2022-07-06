@@ -51,8 +51,20 @@
         const criteria2 = ["kOMhWASTEub", "xHyRsdOrdBF"];
 
 
-        area1(period);
-        area2(criteria2,"s8e95DectKU",period);
+        // area1(period);
+        // area2(criteria2,"s8e95DectKU",period);
+        area('N1sUx4ndd1b',"s8e95DectKU",period,1);
+        area('N1sUx4ndd1b',"s8e95DectKU",period,2);
+        area('N1sUx4ndd1b',"s8e95DectKU",period,3);
+        area('N1sUx4ndd1b',"s8e95DectKU",period,4);
+        area('N1sUx4ndd1b',"s8e95DectKU",period,5);
+        area('N1sUx4ndd1b',"s8e95DectKU",period,6);
+        area('N1sUx4ndd1b',"s8e95DectKU",period,7);
+        area('N1sUx4ndd1b',"s8e95DectKU",period,8);
+        area('N1sUx4ndd1b',"s8e95DectKU",period,9);
+        area('N1sUx4ndd1b',"s8e95DectKU",period,10);
+
+
 
         // var results = getCriteriaDetails("kOMhWASTEub",period,"s8e95DectKU");
         // if (results >= 1) {
@@ -92,7 +104,7 @@
             var area1Observed = 0;
             var area1Reached = 0;
             var rate = 0;
-            if (results >= 7) {
+            if (results >= 1) {
                 $("#area1Observed").html(1);
                 $("#area1Reached").html(1);
                 area1Observed = 1;
@@ -109,27 +121,28 @@
         });
     }
 
-    function area2(criterias, orgUnitId, period) {
-        let area2Observed = 0;
-        let area2Reached = 0;
+    function area(criteria, orgUnitId, period, area) {
+        let areaObserved = 0;
+        let areaReached = 0;
         let rate = 0;
-        $.each(criterias, function (index, value) {
-            $.get("../api/analytics?dimension=dx:"+value+"&dimension=pe:" + period + "&filter=ou:"+ orgUnitId, function (data) {
+        $.get("../api/analytics?dimension=dx:"+criteria+"&dimension=pe:" + period + "&filter=ou:"+ orgUnitId, function (data) {
                 var results = data.rows[0][2];
-                if (results >= 7) {
-                    area2Observed = 1;
-                    area2Reached = 1;
+                if (results >= 1) {
+                    $("#area"+area+"Observed").html(1);
+                    $("#area"+area+"Reached").html(1);
+                    areaObserved = 1;
+                    areaReached = 1;
                 } else {
-                    area2Observed = 1;
-                    area2Reached = 0;
+                    $("#area"+area+"Observed").html(1);
+                    $("#area"+area+"Reached").html(0);
+                    areaObserved = 1;
+                    areaReached = 0;
                 }
-            });
-        });
-        // $("#area2Observed").html(area2Observed);
-        // $("#area2Reached").html(area2Reached);
-        // rate = (area2Reached / area2Observed) * 100;
-        // $("#area2Rate").html(rate);
 
+                rate = (areaReached / areaObserved) * 100;
+                $("#area"+area+"Rate").html(rate);
+        });
+        
     }
     function getCriteriaDetails(criteriaId, period, orgUnitId) {
         $.get("../api/analytics?dimension=dx:" + criteriaId + "&dimension=pe:" + period + "&filter=ou:" + orgUnitId, function (data) {
@@ -194,7 +207,7 @@
                 <td rv="------"><span id="areaI"></span>1</td>
                 <td rv="------"><span id="area1Observed"></span></td>
                 <td><span id="area1Reached"></span></td>
-                <td><span id="area1Rate"></span></td>
+                <td><span id="area1Rate"></span>%</td>
             </tr>
             <tr ri="1">
                 <td rv="II. Materiais e Infraestruturas ">
@@ -202,71 +215,71 @@
                 <td rv="------"><span id="areaII"></span>2</td>
                 <td rv="------"><span id="area2Observed"></span></td>
                 <td><span id="area2Reached"></span></td>
-                <td><span id="area2Rate"></span></td>
+                <td><span id="area2Rate"></span>%</td>
             </tr>
             <tr ri="2">
                 <td rv="III. Identificação Precoce de Vítimas de Violência  ">
                     Identificação Precoce de Vítimas de Violência </td>
                 <td rv="------"><span id="areaIII"></span>3</td>
-                <td rv="------"><span id="areaIIIScore"></span></td>
-                <td></td>
-                <td></td>
+                <td rv="------"><span id="area3Observed"></span></td>
+                <td><span id="area3Reached"></span></td>
+                <td><span id="area3Rate"></span>%</td>
             </tr>
             <tr ri="3">
                 <td rv="IV. Cuidados Clí&shy;nicos Centrados no Utente">
                     Cuidados Clí&shy;nicos Centrados no Utente </td>
                 <td rv="------"><span id="areaIV"></span>11</td>
-                <td rv="------"><span id="areaIVScore"></span></td>
-                <td></td>
-                <td></td>
+                <td rv="------"><span id="area4Observed"></span></td>
+                <td><span id="area4Reached"></span></td>
+                <td><span id="area4Rate"></span>%</td>
             </tr>
             <tr ri="4">
                 <td rv="V. Medicina Legal">
                     Medicina Legal </td>
                 <td rv="------"><span id="areaV"></span>2</td>
-                <td rv="------"><span id="areaVScore"></span></td>
-                <td></td>
-                <td></td>
+                <td rv="------"><span id="area5Observed"></span></td>
+                <td><span id="area5Reached"></span></td>
+                <td><span id="area5Rate"></span>%</td>
             </tr>
             <tr ri="5">
                 <td rv="VI. Sistema de Referência e Seguimento da Vítima ">
                     Sistema de Referência e Seguimento da Vítima </td>
                 <td rv="------"><span id="areaVI"></span>2</td>
-                <td rv="------"><span id="areaVIScore"></span></td>
-                <td></td>
-                <td></td>
+                <td rv="------"><span id="area6Observed"></span></td>
+                <td><span id="area6Reached"></span></td>
+                <td><span id="area6Rate"></span>%</td>
             </tr>
             <tr ri="6">
                 <td rv="VII. Formação e Melhoria de Qualidade ">
                     Formação e Melhoria de Qualidade </td>
                 <td rv="------"><span id="areaVII"></span>2</td>
-                <td rv="------"><span id="areaVIIScore"></span></td>
-                <td></td>
-                <td></td>
+                <td rv="------"><span id="area7Observed"></span></td>
+                <td><span id="area7Reached"></span></td>
+                <td><span id="area7Rate"></span>%</td>
             </tr>
             <tr ri="7">
                 <td rv="VIII. Politicas de Cuidados de Saúde">
                     Politicas de Cuidados de Saúde </td>
                 <td rv="------"><span id="areaVIII"></span>1</td>
-                <td rv="------"><span id="areaVIIIScore"></span></td>
-                <td></td>
-                <td></td>
+                <td rv="------"><span id="area8Observed"></span></td>
+                <td><span id="area8Reached"></span></td>
+                <td><span id="area8Rate"></span>%</td>
             </tr>
             <tr ri="8">
                 <td rv="IX. Criação de Demanda Para Uso de Cuidados Pos Violência ">
                     Criação de Demanda Para Uso de Cuidados Pos Violência </td>
                 <td rv="------"><span id="areaIX"></span>1</td>
-                <td rv="------"><span id="areaIXScore"></span></td>
-                <td></td>
-                <td></td>
+                <td rv="------"><span id="area9Observed"></span></td>
+                <td><span id="area9Reached"></span></td>
+                <td><span id="area9Rate"></span>%</td>
             </tr>
             <tr ri="9">
                 <td rv="X. Reporte e Sistemas de Informação ">
                     Reporte e Sistemas de Informação </td>
                 <td rv="------"><span id="areaX"></span>3</td>
-                <td rv="------"><span id="areaXScore"></span></td>
-                <td></td>
-                <td></td>
+                <td rv="------"><span id="area10Observed"></span></td>
+                <td><span id="area10Reached"></span></td>
+                <td><span id="area10Rate"></span>%</td>
             </tr>
         </tbody>
         <tfoot>
