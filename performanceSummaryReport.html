@@ -122,30 +122,84 @@
     }
 
     function area(criteria, orgUnitId, period, area) {
-        let areaObserved = 0;
-        let areaReached = 0;
-        let rate = 0;
+        // let areaObserved = 0;
+        // let areaReached = 0;
+        // let rate = 0;
         if (criteria.length > 1) {
+            let areaObserved = 0;
+            let areaReached = 0;
+            let rate = 0;
             $.each(criteria, function (index, value) {
-                $.get("../api/analytics?dimension=dx:" + value + "&dimension=pe:" + period + "&filter=ou:" + orgUnitId, function (data) {
-                    var results = data.rows[0][2];
-                    if (results >= 1) {
-                        $("#area" + area + "Observed").html(1);
-                        $("#area" + area + "Reached").html(1);
-                        areaObserved = 1;
-                        areaReached = 1;
-                    } else {
-                        $("#area" + area + "Observed").html(1);
-                        $("#area" + area + "Reached").html(0);
-                        areaObserved = 1;
-                        areaReached = 0;
-                    }
+                const standardDetails = fetch("../api/analytics?dimension=dx:" + value + "&dimension=pe:" + period + "&filter=ou:" + orgUnitId)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        return data;
+                    });
+                const printStandardDetails = async () => {
+                    const data = await standardDetails;
+                    if (data.rows.length > 0) {
+                        let results = data.rows[0][2];
+                        if (results >= 1) {
+                            areaObserved += 1;
+                            areaReached += 1;
+                            console.log(areaObserved);
+                            console.log(areaReached);
 
-                    rate = (areaReached / areaObserved) * 100;
-                    $("#area" + area + "Rate").html(rate);
-                });
+                        } else {
+                            areaObserved++;
+                            areaReached = areaReached + 0;
+                        }
+
+                    } else {
+
+                    }
+                    // if (results >= 1) {
+                    //     // $("#area" + area + "Observed").html(1);
+                    //     // $("#area" + area + "Reached").html(1);
+                    //     areaObserved++;
+                    //     areaReached++;
+                    //     console.log(areaObserved);
+                    //     console.log(areaReached);
+
+                    // } else {
+                    //     // $("#area" + area + "Observed").html(1);
+                    //     // $("#area" + area + "Reached").html(0);
+                    //     areaObserved++;
+                    //     areaReached = areaReached + 0;
+                    // }
+                };
+                printStandardDetails();
+                // $.get("../api/analytics?dimension=dx:" + value + "&dimension=pe:" + period + "&filter=ou:" + orgUnitId, function (data) {
+                //     var results = data.rows[0][2];
+                //     if (results >= 1) {
+                //         // $("#area" + area + "Observed").html(1);
+                //         // $("#area" + area + "Reached").html(1);
+                //         areaObserved++;
+                //         areaReached++;
+                //         console.log(areaObserved);
+                //         console.log(areaReached);
+
+                //     } else {
+                //         // $("#area" + area + "Observed").html(1);
+                //         // $("#area" + area + "Reached").html(0);
+                //         areaObserved++;
+                //         areaReached = areaReached + 0;
+                //     }
+
+                // });
             });
+            console.log("****************");
+            console.log(areaReached);
+            console.log(areaObserved);
+
+            rate = (areaReached / areaObserved) * 100;
+            $("#area" + area + "Rate").html(rate);
+            $("#area" + area + "Observed").html(areaObserved);
+            $("#area" + area + "Reached").html(areaReached);
         } else {
+            let areaObserved = 0;
+            let areaReached = 0;
+            let rate = 0;
             $.get("../api/analytics?dimension=dx:" + criteria + "&dimension=pe:" + period + "&filter=ou:" + orgUnitId, function (data) {
                 var results = data.rows[0][2];
                 if (results >= 1) {

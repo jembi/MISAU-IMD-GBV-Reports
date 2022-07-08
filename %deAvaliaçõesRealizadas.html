@@ -111,13 +111,15 @@
             let internalSum = 0;
             let externalSum = 0;
             let totalSum = 0;
+            let expectedEvaluations = 0;
             let exepectedEvaluationSum = 0;
             let exepectedEvaluationSumPercentage = 0;
             let validEvaluationsSum = 0;
             let validEvaluationSumPercentage = 0;
+            let orgUnitCount = 0;
 
             $.each(orgUnits, function (index, value) {
-                const orgUnitDetails = fetch("../api/organisationUnits/" + value.id + ".json?fields=id,name")
+                const orgUnitDetails = fetch("../api/organisationUnits/" + value.id + ".json?fields=id,name,children")
                     .then((response) => response.json())
                     .then((data) => {
                         return data;
@@ -139,10 +141,16 @@
                         internalSum = parseInt(internalSum) + parseInt(internal);
                         externalSum = parseInt(externalSum) + parseInt(external);
                         totalSum = parseInt(totalSum) + parseInt(total);
-                        exepectedEvaluationSum = parseInt(exepectedEvaluationSum) + parseInt(1)
                         exepectedEvaluationSumPercentage = '100%';
                         validEvaluationsSum = parseInt(validEvaluationsSum) + parseInt(validEvaluations);
                         validEvaluationSumPercentage = parseFloat(validEvaluationSumPercentage) + ((parseFloat(validEvaluationsPercentage)) / parseFloat(count));
+                        if (a.children.length > 0) {
+                            orgUnitCount = a.children.length;
+                            exepectedEvaluationSum = exepectedEvaluationSum + orgUnitCount; //parseInt(exepectedEvaluationSum) + parseInt(1)
+
+                        } else {
+                            orgUnitCount = 1;
+                        }
                         $("#baselineSum").html(baselineSum);
                         $("#internalSum").html(internalSum);
                         $("#externalSum").html(externalSum);
@@ -151,7 +159,7 @@
                         $("#exepectedEvaluationSumPercentage").html(exepectedEvaluationSumPercentage);
                         $("#validEvaluationsSum").html(validEvaluationsSum);
                         $("#validEvaluationSumPercentage").html(validEvaluationSumPercentage);
-                        $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + baseline + '</td> <td>' + internal + '</td><td>' + external + '</td> <td>' + total + '</td> <td>1</td> <td>100%</td> <td>' + validEvaluations + '</td> <td>' + validEvaluationsPercentage + '%</td></tr>');
+                        $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + baseline + '</td> <td>' + internal + '</td><td>' + external + '</td> <td>' + total + '</td> <td>' + orgUnitCount + '</td> <td>100%</td> <td>' + validEvaluations + '</td> <td>' + validEvaluationsPercentage + '%</td></tr>');
 
                     });
                 };
