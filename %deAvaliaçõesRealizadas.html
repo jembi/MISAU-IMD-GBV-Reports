@@ -47,13 +47,13 @@
             var level = json.level;
             if (level == 1) {
                 let count = json.children.length;
-                getReportDetails(json.children, period, count);
+                getReportDetails(json.children, period, count, 1);
             } else if (level == 2) {
                 let count = json.children.length;
-                getReportDetails(json.children, period, count);
+                getReportDetails(json.children, period, count, 2);
             } else if (level == 3) {
                 let count = json.children.length;
-                getReportDetails(json.children, period, count);
+                getReportDetails(json.children, period, count, 3);
             } else if (level == 4) {
                 let validEvaluationsPercentage = 0;
                 $.get("../api/analytics?dimension=dx:yOR81tRBWIw;u7P0opGH3c9;lD2YLTZ8NOe;QYYFkIdTTDY;vA3Y0Bzy4sU;hV52rtgvgEI&dimension=pe:" + period + "&filter=ou:" + orgUnit.id, function (json) {
@@ -99,7 +99,7 @@
             return printOrgUnitDetails();
         }
 
-        function getReportDetails(orgUnits, period, count) {
+        function getReportDetails(orgUnits, period, count, level) {
             let orgUnitName = "";
             let baseline = 0;
             let internal = 0;
@@ -144,13 +144,20 @@
                         exepectedEvaluationSumPercentage = '100%';
                         validEvaluationsSum = parseInt(validEvaluationsSum) + parseInt(validEvaluations);
                         validEvaluationSumPercentage = parseFloat(validEvaluationSumPercentage) + ((parseFloat(validEvaluationsPercentage)) / parseFloat(count));
-                        if (a.children.length > 0) {
+                        if ((level == 3) || (level == 2)) {
+                            if (a.children.length > 0) {
                             orgUnitCount = a.children.length;
-                            exepectedEvaluationSum = exepectedEvaluationSum + orgUnitCount; //parseInt(exepectedEvaluationSum) + parseInt(1)
+                            exepectedEvaluationSum = exepectedEvaluationSum + orgUnitCount;
 
-                        } else {
-                            orgUnitCount = 1;
+                            } else {
+                                orgUnitCount = 1;
+                                exepectedEvaluationSum = exepectedEvaluationSum + orgUnitCount; 
+
+                            }
+                        } else{
+
                         }
+                        
                         $("#baselineSum").html(baselineSum);
                         $("#internalSum").html(internalSum);
                         $("#externalSum").html(externalSum);
