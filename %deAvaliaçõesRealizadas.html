@@ -112,8 +112,8 @@
             let externalSum = 0;
             let totalSum = 0;
             let expectedEvaluations = 0;
-            let exepectedEvaluationSum = 0;
-            let exepectedEvaluationSumPercentage = 0;
+            let expectedEvaluationSum = 0;
+            let expectedEvaluationSumPercentage = 0;
             let validEvaluationsSum = 0;
             let validEvaluationSumPercentage = 0;
             let orgUnitCount = 0;
@@ -141,29 +141,62 @@
                         internalSum = parseInt(internalSum) + parseInt(internal);
                         externalSum = parseInt(externalSum) + parseInt(external);
                         totalSum = parseInt(totalSum) + parseInt(total);
-                        exepectedEvaluationSumPercentage = '100%';
+                        expectedEvaluationSumPercentage = '100%';
                         validEvaluationsSum = parseInt(validEvaluationsSum) + parseInt(validEvaluations);
                         validEvaluationSumPercentage = parseFloat(validEvaluationSumPercentage) + ((parseFloat(validEvaluationsPercentage)) / parseFloat(count));
                         if ((level == 3) || (level == 2)) {
                             if (a.children.length > 0) {
                             orgUnitCount = a.children.length;
-                            exepectedEvaluationSum = exepectedEvaluationSum + orgUnitCount;
+                            expectedEvaluationSum = expectedEvaluationSum + orgUnitCount;
 
                             } else {
                                 orgUnitCount = 1;
-                                exepectedEvaluationSum = exepectedEvaluationSum + orgUnitCount; 
+                                expectedEvaluationSum = expectedEvaluationSum + orgUnitCount; 
 
                             }
                         } else{
+                            // console.log(a.children);
+                            let sumFacilities = 0;
+                            a.children.forEach(element => {
+                                // $.get("../api/organisationUnits/" + element.id + ".json?fields=id,name,level,children", function (json) {
+                                // });
 
+                                const orgUnitChildrenDetails = fetch("../api/organisationUnits/" + element.id + ".json?fields=id,name,children")
+                                    .then((response) => response.json())
+                                    .then((data) => {
+                                        return data;
+                                    });
+                                const printorgUnitChildrenDetails = async () => {
+                                    const a = await orgUnitChildrenDetails;
+                                    sumFacilities = sumFacilities + a.children.length;
+                                };
+                                printorgUnitChildrenDetails();
+                            });
+                            console.log(sumFacilities);
+
+                            // $.each(a.children, function (index, value) {
+                            //     $.get("../api/organisationUnits/" + value.id + ".json?fields=id,name,level,children", function (json) {
+                            //         sumFacilities = sumFacilities + json.children.length;
+                            //         // expectedEvaluationSum = expectedEvaluationSum + orgUnitCount;
+                            //         // $("#expectedEvaluationSum").html(expectedEvaluationSum);
+
+                            //     //     // console.log(orgUnitCount);
+                            //     //     expectedEvaluationSum = expectedEvaluationSum + orgUnitCount;
+                            //     //     console.log(expectedEvaluationSum);
+                            //     });
+                            //     console.log(sumFacilities);
+                            // });
+                            // orgUnitCount = sumFacilities;
+                            // console.log(sumFacilities);
+                            // expectedEvaluationSum = expectedEvaluationSum + orgUnitCount;
                         }
                         
                         $("#baselineSum").html(baselineSum);
                         $("#internalSum").html(internalSum);
                         $("#externalSum").html(externalSum);
                         $("#totalSum").html(totalSum);
-                        $("#exepectedEvaluationSum").html(exepectedEvaluationSum);
-                        $("#exepectedEvaluationSumPercentage").html(exepectedEvaluationSumPercentage);
+                        $("#expectedEvaluationSum").html(expectedEvaluationSum);
+                        $("#expectedEvaluationSumPercentage").html(expectedEvaluationSumPercentage);
                         $("#validEvaluationsSum").html(validEvaluationsSum);
                         $("#validEvaluationSumPercentage").html(validEvaluationSumPercentage);
                         $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + baseline + '</td> <td>' + internal + '</td><td>' + external + '</td> <td>' + total + '</td> <td>' + orgUnitCount + '</td> <td>100%</td> <td>' + validEvaluations + '</td> <td>' + validEvaluationsPercentage + '%</td></tr>');
@@ -172,7 +205,7 @@
                 };
                 printOrgUnitDetails();
             });
-            $('#tblTotal').append('<tr><td>Total</td><td><span id="baselineSum"></span></td><td><span id="internalSum"></span></td><td><span id="externalSum"></span></td> <td><span id="totalSum"></span></td> <td><span id="exepectedEvaluationSum"></span></td> <td>100%</td> <td><span id="validEvaluationsSum"></span></td> <td><span id="validEvaluationSumPercentage"></span>%</td></tr>');
+            $('#tblTotal').append('<tr><td>Total</td><td><span id="baselineSum"></span></td><td><span id="internalSum"></span></td><td><span id="externalSum"></span></td> <td><span id="totalSum"></span></td> <td><span id="expectedEvaluationSum"></span></td> <td>100%</td> <td><span id="validEvaluationsSum"></span></td> <td><span id="validEvaluationSumPercentage"></span>%</td></tr>');
         }
     });
 
