@@ -1,0 +1,350 @@
+<style type="text/css" media="screen">
+    /* Put your CSS styling here */
+    .section {
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 50px;
+        padding-bottom: 50px;
+        width: 930px;
+        font-size: 15px;
+    }
+
+    thead {
+        background-color: #FFC000;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .report-header {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 50px;
+    }
+
+    table {
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+
+<script type="text/javascript">
+
+    // Put your javascript functions here 
+
+    $(document).ready(function () {
+        var date = new Date(dhis2.report.date);
+        var orgUnit = dhis2.report.organisationUnit;
+        var today = new Date();
+
+        console.log(date);
+        console.log(orgUnit);
+        // var orgUnit = dhis2.report.organisationUnit;
+        $("#orgUnit").html(orgUnit.name);
+        $("#date").html(date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear());
+        $("#today").html(today);
+        var fullYear = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var quarter = getQuarter(month);
+        var period = fullYear + quarter;
+        $.get("../api/analytics?dimension=dx:ourMr6BHOFF;TN3hkdipKgL;x1R3Np8VFN3;eIcj1ftb0do;A5F0Rwi0q57;Q6IvIXfzL5j;rQh5WmAPagE;S9NqU7RXfNP;SyueHlWSAyi;GPWY6uNp4Q9&dimension=pe:" + period + "&filter=ou:" + orgUnit.id, function (json) {
+            $("#areaI").html(json.rows[0][2]);
+            $("#areaIScore").html(score(json.rows[0][2]));
+            $("#areaII").html(json.rows[1][2]);
+            $("#areaIIScore").html(score(json.rows[1][2]));
+            $("#areaIII").html(json.rows[2][2]);
+            $("#areaIIIScore").html(score(json.rows[2][2]));
+            $("#areaIV").html(json.rows[3][2]);
+            $("#areaIVScore").html(score(json.rows[3][2]));
+            $("#areaV").html(json.rows[4][2]);
+            $("#areaVScore").html(score(json.rows[4][2]));
+            $("#areaVI").html(json.rows[5][2]);
+            $("#areaVIScore").html(score(json.rows[5][2]));
+            $("#areaVII").html(json.rows[6][2]);
+            $("#areaVIIScore").html(score(json.rows[6][2]));
+            $("#areaVIII").html(json.rows[7][2]);
+            $("#areaVIIIScore").html(score(json.rows[7][2]));
+            $("#areaIX").html(json.rows[8][2]);
+            $("#areaIXScore").html(score(json.rows[8][2]));
+            $("#areaX").html(json.rows[9][2]);
+            $("#areaXScore").html(score(json.rows[9][2]));
+        });
+
+        $("#table1").load("../api/reportTables/ODstImmMZTq/data.html?date=" + date);
+
+    });
+    function getQuarter(month) {
+        if (month == 1 || month == 2 || month == 3) {
+            return 'Q1';
+        } else if (month == 4 || month == 5 || month == 6) {
+            return 'Q2';
+        } else if (month == 7 || month == 8 || month == 9) {
+            return 'Q3';
+        } else if (month == 10 || month == 11 || month == 12) {
+            return 'Q4';
+        }
+    }
+    function score(areaValue) {
+        if (areaValue >= 80) {
+            return "Bom";
+        } else if (areaValue >= 60) {
+            return "Médio";
+        } else {
+            return "Mau";
+        }
+    }
+</script>
+
+<div>
+
+    <!-- Put your HTML mark-up here -->
+    <header class="report-header">
+        <img src="http://nuvem.jembi.org:44981/api/documents/gAtyR6qt1eC/data" height="80px" alt="Emblema">
+        <p>República De Moçambique</p>
+        <hr>
+        <p>Ministério Da Saúde</p>
+        <p>Percentage of criteria of verification achieved by default</p>
+    </header>
+
+    <p style="margin-left: 70px;">
+        <b>Período de Avaliação:</b><span id="date"></span>
+    </p>
+    <p style="margin-left: 70px;">
+        <b>Local: </b> <span id="orgUnit"></span>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th rowspan="2">Área</th>
+                <th rowspan="2">Padrões</th>
+                <th colspan="3">Critérios</th>
+                <th rowspan="2">Resultado da Avaliação (x/y * 100)</th>
+            </tr>
+            <tr>
+                <th>Total de Critérios</th>
+                <th>Observados (x)</th>
+                <th>Alcançados (y)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ri="0">
+                <td rv="I. Disponibilidade de cuidados pós VBG ">
+                    I. Disponibilidade de cuidados pós VBG </td>
+                <td rv="------">Padrão 1</td>
+                <td rv="------"><span id="total1"></span></td>
+                <td rv="------"><span id="observed1"></span></td>
+                <td rv="------"><span id="achieved1"></span></td>
+                <td rv="------"><span id="results1"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="II. Materiais e Infraestruturas " rowspan="2">
+                    II. Materiais e Infraestruturas </td>
+                <td rv="------">Padrão 2</td>
+                <td rv="------"><span id="total2"></span></td>
+                <td rv="------"><span id="observed2"></span></td>
+                <td rv="------"><span id="achieved2"></span></td>
+                <td rv="------"><span id="results2"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 3</td>
+                <td rv="------"><span id="total3"></span></td>
+                <td rv="------"><span id="observed3"></span></td>
+                <td rv="------"><span id="achieved3"></span></td>
+                <td rv="------"><span id="results3"></span></td>
+            </tr>
+            <tr ri="2">
+                <td rv="III. Identificação Precoce de Vítimas de Violência  " rowspan="3">
+                    III. Identificação Precoce de Vítimas de Violência </td>
+                <td rv="------">Padrão 4</td>
+                <td rv="------"><span id="total4"></span></td>
+                <td rv="------"><span id="observed4"></span></td>
+                <td rv="------"><span id="achieved4"></span></td>
+                <td rv="------"><span id="results4"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 5</td>
+                <td rv="------"><span id="total5"></span></td>
+                <td rv="------"><span id="observed5"></span></td>
+                <td rv="------"><span id="achieved5"></span></td>
+                <td rv="------"><span id="results5"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 6</td>
+                <td rv="------"><span id="total6"></span></td>
+                <td rv="------"><span id="observed6"></span></td>
+                <td rv="------"><span id="achieved6"></span></td>
+                <td rv="------"><span id="results6"></span></td>
+            </tr>
+            <tr ri="3">
+                <td rv="IV. Cuidados Clí&shy;nicos Centrados no Utente" rowspan="11">
+                    IV. Cuidados Clí&shy;nicos Centrados no Utente </td>
+                <td rv="------">Padrão 7</td>
+                <td rv="------"><span id="total7"></span></td>
+                <td rv="------"><span id="observed7"></span></td>
+                <td rv="------"><span id="achieved7"></span></td>
+                <td rv="------"><span id="results7"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 8</td>
+                <td rv="------"><span id="total8"></span></td>
+                <td rv="------"><span id="observed8"></span></td>
+                <td rv="------"><span id="achieved8"></span></td>
+                <td rv="------"><span id="results8"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 9</td>
+                <td rv="------"><span id="total9"></span></td>
+                <td rv="------"><span id="observed9"></span></td>
+                <td rv="------"><span id="achieved9"></span></td>
+                <td rv="------"><span id="results9"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 10</td>
+                <td rv="------"><span id="total10"></span></td>
+                <td rv="------"><span id="observed10"></span></td>
+                <td rv="------"><span id="achieved10"></span></td>
+                <td rv="------"><span id="results10"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 11</td>
+                <td rv="------"><span id="total11"></span></td>
+                <td rv="------"><span id="observed11"></span></td>
+                <td rv="------"><span id="achieved11"></span></td>
+                <td rv="------"><span id="results11"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 12</td>
+                <td rv="------"><span id="total12"></span></td>
+                <td rv="------"><span id="observed12"></span></td>
+                <td rv="------"><span id="achieved12"></span></td>
+                <td rv="------"><span id="results12"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 13</td>
+                <td rv="------"><span id="total13"></span></td>
+                <td rv="------"><span id="observed13"></span></td>
+                <td rv="------"><span id="achieved13"></span></td>
+                <td rv="------"><span id="results13"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 14</td>
+                <td rv="------"><span id="total14"></span></td>
+                <td rv="------"><span id="observed14"></span></td>
+                <td rv="------"><span id="achieved14"></span></td>
+                <td rv="------"><span id="results14"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 15</td>
+                <td rv="------"><span id="total15"></span></td>
+                <td rv="------"><span id="observed15"></span></td>
+                <td rv="------"><span id="achieved15"></span></td>
+                <td rv="------"><span id="results15"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 16</td>
+                <td rv="------"><span id="total16"></span></td>
+                <td rv="------"><span id="observed16"></span></td>
+                <td rv="------"><span id="achieved16"></span></td>
+                <td rv="------"><span id="results16"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 17</td>
+                <td rv="------"><span id="total17"></span></td>
+                <td rv="------"><span id="observed17"></span></td>
+                <td rv="------"><span id="achieved17"></span></td>
+                <td rv="------"><span id="results17"></span></td>
+            </tr>
+            <tr ri="4">
+                <td rv="V. Medicina Legal" rowspan="2">
+                    V. Medicina Legal </td>
+                <td rv="------">Padrão 18</td>
+                <td rv="------"><span id="total18"></span></td>
+                <td rv="------"><span id="observed18"></span></td>
+                <td rv="------"><span id="achieved18"></span></td>
+                <td rv="------"><span id="results18"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 19</td>
+                <td rv="------"><span id="total19"></span></td>
+                <td rv="------"><span id="observed19"></span></td>
+                <td rv="------"><span id="achieved19"></span></td>
+                <td rv="------"><span id="results19"></span></td>
+            </tr>
+            <tr ri="5">
+                <td rv="VI. Sistema de Referência e Seguimento da Vítima " rowspan="2">
+                    VI. Sistema de Referência e Seguimento da Vítima </td>
+                <td rv="------">Padrão 20</td>
+                <td rv="------"><span id="total20"></span></td>
+                <td rv="------"><span id="observed20"></span></td>
+                <td rv="------"><span id="achieved20"></span></td>
+                <td rv="------"><span id="results20"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 21</td>
+                <td rv="------"><span id="total21"></span></td>
+                <td rv="------"><span id="observed21"></span></td>
+                <td rv="------"><span id="achieved21"></span></td>
+                <td rv="------"><span id="results21"></span></td>
+            </tr>
+            <tr ri="6">
+                <td rv="VII. Formação e Melhoria de Qualidade " rowspan="2">
+                    VII. Formação e Melhoria de Qualidade </td>
+                <td rv="------">Padrão 22</span></td>
+                <td rv="------"><span id="total22"></span></td>
+                <td rv="------"><span id="observed22"></span></td>
+                <td rv="------"><span id="achieved22"></span></td>
+                <td rv="------"><span id="results22"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 23</td>
+                <td rv="------"><span id="total23"></span></td>
+                <td rv="------"><span id="observed23"></span></td>
+                <td rv="------"><span id="achieved23"></span></td>
+                <td rv="------"><span id="results23"></span></td>
+            </tr>
+            <tr ri="7">
+                <td rv="VIII. Politicas de Cuidados de Saúde">
+                    VIII. Politicas de Cuidados de Saúde </td>
+                <td rv="------">Padrão 24</td>
+                <td rv="------"><span id="total24"></span></td>
+                <td rv="------"><span id="observed24"></span></td>
+                <td rv="------"><span id="achieved24"></span></td>
+                <td rv="------"><span id="results24"></span></td>
+            </tr>
+            <tr ri="8">
+                <td rv="IX. Criação de Demanda Para Uso de Cuidados Pos Violência ">
+                    IX. Criação de Demanda Para Uso de Cuidados Pos Violência </td>
+                <td rv="------">Padrão 25</span></td>
+                <td rv="------"><span id="total25"></span></td>
+                <td rv="------"><span id="observed25"></span></td>
+                <td rv="------"><span id="achieved25"></span></td>
+                <td rv="------"><span id="results25"></span></td>
+            </tr>
+            <tr ri="9">
+                <td rv="X. Reporte e Sistemas de Informação " rowspan="3">
+                    X. Reporte e Sistemas de Informação </td>
+                <td rv="------">Padrão 26</td>
+                <td rv="------"><span id="total26"></span></td>
+                <td rv="------"><span id="observed26"></span></td>
+                <td rv="------"><span id="achieved26"></span></td>
+                <td rv="------"><span id="results26"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 27</td>
+                <td rv="------"><span id="total27"></span></td>
+                <td rv="------"><span id="observed27"></span></td>
+                <td rv="------"><span id="achieved27"></span></td>
+                <td rv="------"><span id="results27"></span></td>
+            </tr>
+            <tr ri="1">
+                <td rv="------">Padrão 28</td>
+                <td rv="------"><span id="total28"></span></td>
+                <td rv="------"><span id="observed28"></span></td>
+                <td rv="------"><span id="achieved28"></span></td>
+                <td rv="------"><span id="results28"></span></td>
+            </tr>
+        </tbody>
+    </table>
+    <p style="margin-left: 70px;"><b>Data de Geração:</b><span id="today"></span></p>
+    <p style="margin-left: 70px;"><b>Source:</b><span id="today"></span></p>
+
+</div>
