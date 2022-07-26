@@ -44,26 +44,26 @@
             var quarter = getQuarter(month);
             var period = fullYear+quarter;
             $.get("../api/analytics?dimension=dx:ourMr6BHOFF;TN3hkdipKgL;x1R3Np8VFN3;eIcj1ftb0do;A5F0Rwi0q57;Q6IvIXfzL5j;rQh5WmAPagE;S9NqU7RXfNP;SyueHlWSAyi;GPWY6uNp4Q9&dimension=pe:"+period+"&filter=ou:" + orgUnit.id, function (json) {
-                    $("#areaI").html(json.rows[0][2]);
+                    $("#areaI").html(parseInt(json.rows[0][2]));
                     $("#areaIScore").html(score(json.rows[0][2]));
-                    $("#areaII").html(json.rows[1][2]);
+                    $("#areaII").html(parseInt(json.rows[1][2]));
                     $("#areaIIScore").html(score(json.rows[1][2]));
-                    $("#areaIII").html(json.rows[2][2]);
+                    $("#areaIII").html(parseInt(json.rows[2][2]));
                     $("#areaIIIScore").html(score(json.rows[2][2]));
-                    $("#areaIV").html(json.rows[3][2]);
+                    $("#areaIV").html(parseInt(json.rows[3][2]));
                     $("#areaIVScore").html(score(json.rows[3][2]));
-                    $("#areaV").html(json.rows[4][2]);
+                    $("#areaV").html(parseInt(json.rows[4][2]));
                     $("#areaVScore").html(score(json.rows[4][2]));
-                    $("#areaVI").html(json.rows[5][2]);
+                    $("#areaVI").html(parseInt(json.rows[5][2]));
                     $("#areaVIScore").html(score(json.rows[5][2]));
-                    $("#areaVII").html(json.rows[6][2]);
+                    $("#areaVII").html(parseInt(json.rows[6][2]));
                     $("#areaVIIScore").html(score(json.rows[6][2]));
-                    $("#areaVIII").html(json.rows[7][2]);
+                    $("#areaVIII").html(parseInt(json.rows[7][2]));
                     $("#areaVIIIScore").html(score(json.rows[7][2]));
-                    $("#areaIX").html(json.rows[8][2]);
+                    $("#areaIX").html(parseInt(json.rows[8][2]));
                     $("#areaIXScore").html(score(json.rows[8][2]));
-                    $("#areaX").html(json.rows[9][2]);
-                    $("#areaXScore").html(score(json.rows[9][2]));
+                    $("#areaX").html(parseInt(json.rows[9][2]));
+                    $("#areaXScore").html(parseInt(score(json.rows[9][2])));
                 });
 
         $("#table1").load("../api/reportTables/ODstImmMZTq/data.html?date=" + date);

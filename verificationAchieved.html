@@ -36,9 +36,47 @@
         var orgUnit = dhis2.report.organisationUnit;
         var today = new Date();
 
-        console.log(date);
+        // console.log(date);
         console.log(orgUnit);
-        // var orgUnit = dhis2.report.organisationUnit;
+        const orgUnitData = fetch("../api/organisationUnitGroups/hT9sMYwIFgZ")
+            .then((response) => response.json())
+            .then((data) => {
+                return data;
+            });
+        const orgUnitDataDetails = async () => {
+            const data = await orgUnitData;
+            const basicFacilities = data.organisationUnits;
+            const searchResults = basicFacilities.find((basicFacilities) => basicFacilities.id == orgUnit.id);
+
+            if (typeof searchResults !== 'undefined') {
+                console.log(searchResults);
+                $.get("../api/organisationUnitGroups/hT9sMYwIFgZ.json", function (orgUnitData) {
+
+                });
+            } else {
+                console.log("This is a complete Facility");
+                $.get("../api/organisationUnitGroups/hT9sMYwIFgZ.json", function (orgUnitData) {
+
+                });
+            }
+        };
+        orgUnitDataDetails();
+        $.get("../api/dataElementGroups.json?fields=id,name,dataElements&filter=id:in:[jQU8W2XYRzi,KhjsVhQo7LN,OV51KyWFTy4,QS3hul1dltX,SjFwfdDdG5g,Nlr6RX0GEg0,aXKLRdZjxOd,rM1ldmwyhs2,DlD54Q5SQZh,g2jrTKbIqWK,gGpw5TKKM9l]", function (data) {
+            $("#total1").html(data.dataElementGroups[0].dataElements.length);
+            $("#total2").html(data.dataElementGroups[1].dataElements.length);
+            $("#total5").html(data.dataElementGroups[2].dataElements.length);
+            $("#total6").html(data.dataElementGroups[3].dataElements.length);
+            $("#total7").html(data.dataElementGroups[4].dataElements.length);
+            $("#total8").html(data.dataElementGroups[5].dataElements.length);
+            $("#total9").html(data.dataElementGroups[6].dataElements.length);
+            $("#total14").html(data.dataElementGroups[7].dataElements.length);
+            $("#total15").html(data.dataElementGroups[8].dataElements.length);
+            $("#total24").html(data.dataElementGroups[9].dataElements.length);
+            $("#total26").html(data.dataElementGroups[10].dataElements.length);
+
+
+        });
+
         $("#orgUnit").html(orgUnit.name);
         $("#date").html(date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear());
         $("#today").html(today);
@@ -46,30 +84,30 @@
         var month = date.getMonth() + 1;
         var quarter = getQuarter(month);
         var period = fullYear + quarter;
-        $.get("../api/analytics?dimension=dx:ourMr6BHOFF;TN3hkdipKgL;x1R3Np8VFN3;eIcj1ftb0do;A5F0Rwi0q57;Q6IvIXfzL5j;rQh5WmAPagE;S9NqU7RXfNP;SyueHlWSAyi;GPWY6uNp4Q9&dimension=pe:" + period + "&filter=ou:" + orgUnit.id, function (json) {
-            $("#areaI").html(json.rows[0][2]);
-            $("#areaIScore").html(score(json.rows[0][2]));
-            $("#areaII").html(json.rows[1][2]);
-            $("#areaIIScore").html(score(json.rows[1][2]));
-            $("#areaIII").html(json.rows[2][2]);
-            $("#areaIIIScore").html(score(json.rows[2][2]));
-            $("#areaIV").html(json.rows[3][2]);
-            $("#areaIVScore").html(score(json.rows[3][2]));
-            $("#areaV").html(json.rows[4][2]);
-            $("#areaVScore").html(score(json.rows[4][2]));
-            $("#areaVI").html(json.rows[5][2]);
-            $("#areaVIScore").html(score(json.rows[5][2]));
-            $("#areaVII").html(json.rows[6][2]);
-            $("#areaVIIScore").html(score(json.rows[6][2]));
-            $("#areaVIII").html(json.rows[7][2]);
-            $("#areaVIIIScore").html(score(json.rows[7][2]));
-            $("#areaIX").html(json.rows[8][2]);
-            $("#areaIXScore").html(score(json.rows[8][2]));
-            $("#areaX").html(json.rows[9][2]);
-            $("#areaXScore").html(score(json.rows[9][2]));
-        });
+        // $.get("../api/analytics?dimension=dx:ourMr6BHOFF;TN3hkdipKgL;x1R3Np8VFN3;eIcj1ftb0do;A5F0Rwi0q57;Q6IvIXfzL5j;rQh5WmAPagE;S9NqU7RXfNP;SyueHlWSAyi;GPWY6uNp4Q9&dimension=pe:" + period + "&filter=ou:" + orgUnit.id, function (json) {
+        //     $("#areaI").html(json.rows[0][2]);
+        //     $("#areaIScore").html(score(json.rows[0][2]));
+        //     $("#areaII").html(json.rows[1][2]);
+        //     $("#areaIIScore").html(score(json.rows[1][2]));
+        //     $("#areaIII").html(json.rows[2][2]);
+        //     $("#areaIIIScore").html(score(json.rows[2][2]));
+        //     $("#areaIV").html(json.rows[3][2]);
+        //     $("#areaIVScore").html(score(json.rows[3][2]));
+        //     $("#areaV").html(json.rows[4][2]);
+        //     $("#areaVScore").html(score(json.rows[4][2]));
+        //     $("#areaVI").html(json.rows[5][2]);
+        //     $("#areaVIScore").html(score(json.rows[5][2]));
+        //     $("#areaVII").html(json.rows[6][2]);
+        //     $("#areaVIIScore").html(score(json.rows[6][2]));
+        //     $("#areaVIII").html(json.rows[7][2]);
+        //     $("#areaVIIIScore").html(score(json.rows[7][2]));
+        //     $("#areaIX").html(json.rows[8][2]);
+        //     $("#areaIXScore").html(score(json.rows[8][2]));
+        //     $("#areaX").html(json.rows[9][2]);
+        //     $("#areaXScore").html(score(json.rows[9][2]));
+        // });
 
-        $("#table1").load("../api/reportTables/ODstImmMZTq/data.html?date=" + date);
+        // $("#table1").load("../api/reportTables/ODstImmMZTq/data.html?date=" + date);
 
     });
     function getQuarter(month) {
@@ -105,10 +143,10 @@
         <p>Percentagem de critérios de verificação alcançados por padrão</p>
     </header>
 
-    <p style="margin-left: 70px;">
+    <p>
         <b>Período de Avaliação:</b><span id="date"></span>
     </p>
-    <p style="margin-left: 70px;">
+    <p>
         <b>Local: </b> <span id="orgUnit"></span>
     </p>
     <table class="table">
@@ -344,7 +382,7 @@
             </tr>
         </tbody>
     </table>
-    <p style="margin-left: 70px;"><b>Data de Geração:</b><span id="today"></span></p>
-    <p style="margin-left: 70px;"><b>Source:</b><span id="today"></span></p>
+    <p><b>Data de Geração:</b><span id="today"></span></p>
+    <p><b>Source:</b><span id="today"></span></p>
 
 </div>
