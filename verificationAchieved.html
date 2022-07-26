@@ -55,7 +55,24 @@
                 });
             } else {
                 console.log("This is a complete Facility");
-                $.get("../api/organisationUnitGroups/hT9sMYwIFgZ.json", function (orgUnitData) {
+                $.get("../api/dataElementGroups.json?fields=id,name,dataElements&filter=id:in:[qXJfnzutsQF,bmL0X9z660x,QMl3f0HJQfQ,ZpbM6OHwPKe,mgee2h9D8gZ,AxgalzESGMb,e6dGGxhNma2,bgU1dCGAmsq,O9LuqhTuRqy,ODs03ymlwyn,apJ3ar0jXq6,AIT3jqgJEM4,Cj3imG9eyxt,RC7E5frWOTE,hac4oO0zsFB,u7luGu7HsvP,J2cWQnL3ZPX]", function (data) {
+                    $("#total3").html(data.dataElementGroups[0].dataElements.length);
+                    $("#total4").html(data.dataElementGroups[1].dataElements.length);
+                    $("#total10").html(data.dataElementGroups[2].dataElements.length);
+                    $("#total11").html(data.dataElementGroups[3].dataElements.length);
+                    $("#total12").html(data.dataElementGroups[4].dataElements.length);
+                    $("#total13").html(data.dataElementGroups[5].dataElements.length);
+                    $("#total16").html(data.dataElementGroups[6].dataElements.length);
+                    $("#total17").html(data.dataElementGroups[7].dataElements.length);
+                    $("#total18").html(data.dataElementGroups[8].dataElements.length);
+                    $("#total19").html(data.dataElementGroups[9].dataElements.length);
+                    $("#total20").html(data.dataElementGroups[10].dataElements.length);
+                    $("#total21").html(data.dataElementGroups[11].dataElements.length);
+                    $("#total22").html(data.dataElementGroups[12].dataElements.length);
+                    $("#total23").html(data.dataElementGroups[13].dataElements.length);
+                    $("#total25").html(data.dataElementGroups[14].dataElements.length);
+                    $("#total27").html(data.dataElementGroups[15].dataElements.length);
+                    $("#total28").html(data.dataElementGroups[16].dataElements.length);
 
                 });
             }
@@ -73,8 +90,6 @@
             $("#total15").html(data.dataElementGroups[8].dataElements.length);
             $("#total24").html(data.dataElementGroups[9].dataElements.length);
             $("#total26").html(data.dataElementGroups[10].dataElements.length);
-
-
         });
 
         $("#orgUnit").html(orgUnit.name);
