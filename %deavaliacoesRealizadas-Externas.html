@@ -78,7 +78,8 @@
                     $("#external").html(json.rows[0][2]);
                     $("#orgUnit4").html(orgUnit.name);
                 });
-                $("#ExternalEvaluationsPerformed").html("Número de Avaliações Externas Realizadas");    
+                $("#ExternalEvaluationsPerformed").html("Número de Avaliações Externas Realizadas"); 
+                $('#numberOfHFWithExternalEvaluations').hide();   
                 $('#tblOrgainzationUnits').append('<tr><td><span id="orgUnit4"></span></td> <td><span id="external"></span></td> </tr>');
 
             }
@@ -163,7 +164,8 @@
                             $("#totalUsSum").html(totalUsSum);
         
                             if (level == 3) {
-                                $("#ExternalEvaluationsPerformed").html("Número de Avaliações Externas Realizadas");    
+                                $("#ExternalEvaluationsPerformed").html("Número de Avaliações Externas Realizadas");  
+                                $('#numberOfHFWithExternalEvaluations').hide();     
                                 $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td> <td>' + external + '</td> </tr>');
                             } else {
                                 $("#numberOfHFWithExternalEvaluations").html("Número de US com Avaliações Externas");
