@@ -83,12 +83,10 @@
                     validEvaluationsPercentage = (parseInt(json.rows[5][2]) / parseInt(json.rows[4][2])) * 100 || 0;
                     percentageOfEvaluationsPerformed = ((parseInt(json.rows[0][2]) / 1) * 100).toFixed()
                     $("#validEvaluationsPercentage").html(validEvaluationsPercentage);
-                    $("#percentageOfEvaluationsPerformed").html(percentageOfEvaluationsPerformed);
-
-
+                    $("#percentageOfEvaluationsPerformed").html(percentageOfEvaluationsPerformed + '%');
                 });
 
-                $('#tblOrgainzationUnits').append('<tr><td><span id="orgUnit4"></span></td><td><span>1</span></td> <td id="baseline"></td> <td id="percentageOfEvaluationsPerformed">%</td> <td><span id="validEvaluations"></span></td> <td><span id="validEvaluationsPercentage"></span>%</td></tr>');
+                $('#tblOrgainzationUnits').append('<tr><td><span id="orgUnit4"></span></td><td><span>1</span></td> <td id="baseline"></td> <td id="percentageOfEvaluationsPerformed"></td> <td><span id="validEvaluations"></span></td> <td><span id="validEvaluationsPercentage"></span>%</td></tr>');
 
             }
 
@@ -202,10 +200,12 @@
                                 b.organisationUnits.forEach(element => {
                                     sumFacilities = sumFacilities + element.children.length;
                                 });
+                                
                                 orgUnitCount = sumFacilities;
+                                percentageOfEvaluationsPerformed = parseInt(percentageOfEvaluationsPerformed) + ((parseInt(baseline) / parseInt(sumFacilities)) * 100);
+
                                 expectedEvaluationSum = expectedEvaluationSum + orgUnitCount;
                                 baselineSum = parseInt(baselineSum) + parseInt(baseline);
-                                percentageOfEvaluationsPerformed = ((parseInt(baseline) / parseInt(orgUnitCount)) * 100).toFixed();
                                 validEvaluationsSum = parseInt(validEvaluationsSum) + parseInt(validEvaluations);
                                 validEvaluationSumPercentage = parseFloat(validEvaluationSumPercentage) + ((parseFloat(validEvaluationsPercentage)) / parseFloat(count));
                                 $("#baselineSum").html(baselineSum);
