@@ -78,12 +78,14 @@
                     $("#baseline").html(json.rows[0][2]);   
                     $("#validEvaluations").html(json.rows[4][2]);
                     $("#orgUnit4").html(orgUnit.name);
-                    validEvaluationsPercentage = (parseInt(json.rows[5][2]) / parseInt(json.rows[4][2])) * 100 || 0;
+                    $("#expectedEvaluations").html(1);
+
+                    validEvaluationsPercentage = (parseInt(json.rows[4][2]) / 1) * 100 || 0;
                     $("#validEvaluationsPercentage").html(validEvaluationsPercentage);
 
                 });
 
-                $('#tblOrgainzationUnits').append('<tr><td><span id="orgUnit4"></span></td><td><span id="baseline"></span></td> <td>1</td> <td>100%</td> <td><span id="validEvaluations"></span></td> <td><span id="validEvaluationsPercentage"></span>%</td></tr>');
+                $('#tblOrgainzationUnits').append('<tr><td><span id="orgUnit4"></span></td><td><span id="expectedEvaluations"></span></td> <td><span id="validEvaluations"></span></td> <td><span id="validEvaluationsPercentage"></span>%</td> <td><span id="validEvaluations"></span></td> <td><span id="validEvaluationsPercentage"></span>%</td></tr>');
 
             }
 
@@ -138,6 +140,8 @@
                 const printOrgUnitDetails = async () => {
                     let orgUnitName = "";
                     let baseline = 0;
+                    let baselinePercentage = 0;
+                    let baselineSumPercentage = 0;
                     let validEvaluations = 0;
                     let validEvaluationsPercentage = 0;
                     let expectedEvaluations = 0;
@@ -164,12 +168,16 @@
                             expectedEvaluationSumPercentage = '100%';
                             validEvaluationsSum = parseInt(validEvaluationsSum) + parseInt(validEvaluations);
                             validEvaluationSumPercentage = parseFloat(validEvaluationSumPercentage) + ((parseFloat(validEvaluationsPercentage)) / parseFloat(count));
+                            if (baseline > 0) {
+                                baselinePercentage = (baseline / orgUnitCount) * 100;
+                            } 
+                            baselineSumPercentage = parseFloat(validEvaluationSumPercentage) + ((parseFloat(validEvaluationsPercentage)) / parseFloat(count)); parseInt(baselineSum) 
                             $("#baselineSum").html(baselineSum);
                             $("#expectedEvaluationSum").html(expectedEvaluationSum);
                             $("#expectedEvaluationSumPercentage").html(expectedEvaluationSumPercentage);
                             $("#validEvaluationsSum").html(validEvaluationsSum);
                             $("#validEvaluationSumPercentage").html(validEvaluationSumPercentage);
-                            $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + baseline + '</td>  <td>' + orgUnitCount + '</td> <td>100%</td> <td>' + validEvaluations + '</td> <td>' + validEvaluationsPercentage + '%</td></tr>');
+                            $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + orgUnitCount  + '</td>  <td>' + baseline + '</td> <td>'+ baselinePercentage +'%</td> <td>' + validEvaluations + '</td> <td>' + validEvaluationsPercentage + '%</td></tr>');
                         } else{
                             let sumFacilities = 0;
                             const orgUnitChildrenDetails = fetch("../api/organisationUnits?fields=id,name,level,children[id,name,level,children[id,name,level]]&filter=parent.id:eq:" + value.id)
@@ -188,12 +196,15 @@
                                 expectedEvaluationSumPercentage = '100%';
                                 validEvaluationsSum = parseInt(validEvaluationsSum) + parseInt(validEvaluations);
                                 validEvaluationSumPercentage = parseFloat(validEvaluationSumPercentage) + ((parseFloat(validEvaluationsPercentage)) / parseFloat(count));
+                                if (baseline > 0) {
+                                    baselinePercentage = (baseline / orgUnitCount) * 100;
+                                }
                                 $("#baselineSum").html(baselineSum);
                                 $("#expectedEvaluationSum").html(expectedEvaluationSum);
                                 $("#expectedEvaluationSumPercentage").html(expectedEvaluationSumPercentage);
                                 $("#validEvaluationsSum").html(validEvaluationsSum);
                                 $("#validEvaluationSumPercentage").html(validEvaluationSumPercentage.toFixed(2));
-                                $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + baseline + '</td> <td>' + orgUnitCount + '</td> <td>100%</td> <td>' + validEvaluations + '</td> <td>' + validEvaluationsPercentage + '%</td></tr>');
+                                $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + orgUnitCount + '</td> <td>' + baseline + '</td> <td>'+ baselinePercentage +'%</td> <td>' + validEvaluations + '</td> <td>' + validEvaluationsPercentage + '%</td></tr>');
                             };
                             printorgUnitChildrenDetails();
                         }
@@ -201,7 +212,7 @@
                 };
                 printOrgUnitDetails();
             });
-            $('#tblTotal').append('<tr><td>Total</td><td><span id="baselineSum"></span></td> <td><span id="expectedEvaluationSum"></span></td> <td>100%</td> <td><span id="validEvaluationsSum"></span></td> <td><span id="validEvaluationSumPercentage"></span>%</td></tr>');
+            $('#tblTotal').append('<tr><td>Total</td><td><span id="expectedEvaluationSum"></span></td> <td><span id="baselineSum"></span></td> <td>100%</td> <td><span id="validEvaluationsSum"></span></td> <td><span id="validEvaluationSumPercentage"></span>%</td></tr>');
         }
     });
 
