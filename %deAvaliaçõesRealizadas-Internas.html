@@ -168,7 +168,7 @@
                             $("#expectedEvaluationSumPercentage").html(expectedEvaluationSumPercentage);
                             $("#validEvaluationsSum").html(validEvaluationsSum);
                             $("#validEvaluationSumPercentage").html(validEvaluationSumPercentage);
-                            $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + internal + '</td> <td>' + internal + '</td><td>' + orgUnitCount + '</td> <td>100%</td> <td>' + validEvaluations + '</td> <td>' + validEvaluationsPercentage + '%</td></tr>');
+                            $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + internal + '</td> <td>' + internal + '</td><td>' + orgUnitCount + '</td> <td>' + internal + '</td> <td>' + validEvaluationsPercentage + '</td> <td>' + validEvaluations + '</td><td>' + validEvaluationsPercentage + '%</td></tr>');
                         } else{
                             let sumFacilities = 0;
                             const orgUnitChildrenDetails = fetch("../api/organisationUnits?fields=id,name,level,children[id,name,level,children[id,name,level]]&filter=parent.id:eq:" + value.id)
@@ -192,7 +192,7 @@
                                 $("#expectedEvaluationSumPercentage").html(expectedEvaluationSumPercentage);
                                 $("#validEvaluationsSum").html(validEvaluationsSum);
                                 $("#validEvaluationSumPercentage").html(validEvaluationSumPercentage.toFixed(2));
-                                $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + internal + '</td> <td>' + internal + '</td><td>' + orgUnitCount + '</td> <td>100%</td> <td>' + validEvaluations + '</td> <td>' + validEvaluationsPercentage + '%</td></tr>');
+                                $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + internal + '</td> <td>' + internal + '</td><td>' + orgUnitCount + '</td> <td>' + internal + '</td> <td>' + validEvaluationsPercentage + '</td> <td>' + validEvaluations + '</td><td>' + validEvaluationsPercentage + '%</td></tr>');
                             };
                             printorgUnitChildrenDetails();
                         }
@@ -200,7 +200,7 @@
                 };
                 printOrgUnitDetails();
             });
-            $('#tblTotal').append('<tr><td>Total</td><td><span id="internalSum"></span></td> <td><span id="internalSum2"></span></td><td><span id="expectedEvaluationSum"></span></td> <td>100%</td> <td><span id="validEvaluationsSum"></span></td> <td><span id="validEvaluationSumPercentage"></span>%</td></tr>');
+            $('#tblTotal').append('<tr><td>Total</td><td><span id="internalSum"></span></td> <td><span id="internalSum"></span></td><td><span id="expectedEvaluationSum"></span></td> <td><span id="internalSum"></span></td><td>100%</td> <td><span id="validEvaluationsSum"></span></td> <td><span id="validEvaluationSumPercentage"></span>%</td></tr>');
         }
     });
 
@@ -222,14 +222,15 @@
         <p class="parameters"><b>Período de Avaliação:</b>  <span id="reportPeriod"></span> </p>    
 
     <table class="table">
-        <thead>
+        <thead id="tableHead">
             <tr>
                 <th rowspan="2">Província</th>
                 <th rowspan="2">Número de US que Implementam IMD</th>
-                <th rowspan="2">Avaliações Linha de Base Esperadas(x)</th>
-                <th rowspan="2">Avaliações Linha de Base Realizadas(y)</th>
-                <th rowspan="2">% Avaliações Linha de Base Realizadas(y/x * 100)</th>
-                <th colspan="2">Avaliações Linha de Base Realizadas a Tempo</th>
+                <th rowspan="2">Número de US com Avaliações Internas</th>
+                <th rowspan="2">Avaliações Interna Esperadas(x)</th>
+                <th rowspan="2">Avaliações Interna Realizadas(y)</th>
+                <th rowspan="2">% Avaliações Interna Realizadas(y/x * 100)</th>
+                <th colspan="2">Avaliações Interna Realizadas a Tempo</th>
             </tr>
             <tr>
                 <th>Nº(w)</th>

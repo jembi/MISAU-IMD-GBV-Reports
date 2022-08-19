@@ -131,7 +131,7 @@
             let validEvaluationSumPercentage = 0;
 
             $.each(orgUnits, function (index, value) {
-                const orgUnitDetails = fetch("../api/organisationUnits/" + value.id + ".json?fields=id,name,children")
+                const orgUnitDetails = fetch("../api/organisationUnits/" + value.id + ".json?fields=id,name,children,openingDate")
                     .then((response) => response.json())
                     .then((data) => {
                         return data;
