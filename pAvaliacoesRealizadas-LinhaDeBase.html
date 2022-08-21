@@ -163,8 +163,8 @@
                     console.log(result.reason);
 
             })
-            totals.performedBaseLineCountPercentage = totals.performedBaseLineCount / totals.expectedBaseLineCount * 100;
-            totals.inTimePerformedBaseLineCountPercentage = totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100;
+            totals.expectedBaseLineCount ==0 ? 0: totals.performedBaseLineCountPercentage = totals.performedBaseLineCount / totals.expectedBaseLineCount * 100;
+            totals.performedBaseLineCount ==0 ? 0: totals.inTimePerformedBaseLineCountPercentage = totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100;
             rows.push(totals);
 
             return rows;
@@ -218,8 +218,8 @@
                     console.log(result.reason);
 
             })
-            totals.performedBaseLineCountPercentage = totals.performedBaseLineCount / totals.expectedBaseLineCount * 100;
-            totals.inTimePerformedBaseLineCountPercentage = totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100;
+            totals.expectedBaseLineCount ==0 ? 0: totals.performedBaseLineCountPercentage = totals.performedBaseLineCount / totals.expectedBaseLineCount * 100;
+            totals.performedBaseLineCount ==0 ? 0: totals.inTimePerformedBaseLineCountPercentage = totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100;
             rows.push(totals);
 
             return rows;
@@ -274,8 +274,8 @@
                     console.log(result.reason);
 
             })
-            totals.performedBaseLineCountPercentage = totals.performedBaseLineCount / totals.expectedBaseLineCount * 100;
-            totals.inTimePerformedBaseLineCountPercentage = totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100;
+            totals.expectedBaseLineCount ==0 ? 0: totals.performedBaseLineCountPercentage = totals.performedBaseLineCount / totals.expectedBaseLineCount * 100;
+            totals.performedBaseLineCount ==0 ? 0: totals.inTimePerformedBaseLineCountPercentage = totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100;
             rows.push(totals);
 
             return rows;
