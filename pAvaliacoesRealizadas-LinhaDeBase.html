@@ -287,7 +287,7 @@
     }
 
     $(document).ready(function () {
-       
+
         $("#notImplementingVBG").hide();
         var date = new Date(dhis2.report.date);
         var orgUnit = dhis2.report.organisationUnit;
@@ -308,6 +308,7 @@
             var level = json.level;
             switch (level) {
                 case 1:
+                    $("#reportLevel").html("<b> Nacional: </b>" + orgUnit.name);
                     $("#orgUnitLevel").html(levels[0]);
                     getReportDetailsNational(json, date).then((rows) => {
                         rows.slice(0, -1)
@@ -326,6 +327,7 @@
                     }).finally(() => $("#loader").hide());
                     break;
                 case 2:
+                    $("#reportLevel").html("<b>Provincial: </b>" + orgUnit.name);
                     $("#orgUnitLevel").html(levels[1]);
                     getReportDetailsProvincial(json, date)
                         .then((rows) => {
@@ -349,6 +351,7 @@
                     break;
 
                 case 3:
+                    $("#reportLevel").html("<b>Distrital: </b>" + orgUnit.name);
                     $("#orgUnitLevel").html(levels[2]);
 
 
@@ -371,7 +374,7 @@
                     break;
 
                 case 4:
-
+                    $("#reportLevel").html("<b>Unidade Sanitária: </b>" + orgUnit.name);
                     $("#orgUnitLevel").html("Unidade Sanitária");
                     getReportDetailsHF(orgUnit, date).then(
                         (columns) => {
@@ -443,6 +446,7 @@
     <hr>
     <br>
     <p class="parameters"><b>Período de Avaliação:</b> <span id="reportPeriod"></span> </p>
+    <p class="parameters"><b>Nivel </b> <span id="reportLevel"></span> </p>
 
     <table class="table">
         <thead>
@@ -460,10 +464,10 @@
         </thead>
         <tbody id="tblOrgainzationUnits">
             <tr id="loader">
-                <td colspan="3"> A processar os dados ...</td>
+                <td colspan="6"> A processar os dados ...</td>
             </tr>
             <tr id="notImplementingVBG">
-                <td colspan="2"> A US <span style="font-weight: bold; font-style:italic;" id="healthF"></span>
+                <td colspan="6"> A US (<span style="font-weight: bold; font-style:italic;" id="healthF"></span>)
                     Selecionada não implementa o eIMD - VBG</td>
             </tr>
 

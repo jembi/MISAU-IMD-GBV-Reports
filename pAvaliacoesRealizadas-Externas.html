@@ -305,11 +305,11 @@
                 case 3:
                     $("#reportLevel").html("<b>Distrital: </b>" + orgUnit.name);
                     $("#orgUnitLevel").html(levels[2]);
+                    $("#nrHealthFacilitiesWithExternalEvaluations").hide();
                     getReportDetailsDistrict(json, date)
                         .then((healthFacilities) => {
                             healthFacilities.slice(0, -1)
                                 .forEach((healthFacility) => {
-                                    $("#nrHealthFacilitiesWithExternalEvaluations").hide();
                                     $('#tblOrgainzationUnits').append('<tr><td>' + healthFacility['healthFacilityName']
                                         + '</td><td>' + healthFacility['externalPerformed'] + '</td></tr>');
 
@@ -320,11 +320,11 @@
                     break;
 
                 case 4:
+                $("#reportLevel").html("<b>Unidade Sanitária: </b>" + orgUnit.name);
                     $("#orgUnitLevel").html("Local");
+                    $("#nrHealthFacilitiesWithExternalEvaluations").hide();
                     getReportDetailsHF(orgUnit, date).then(
                         (columns) => {
-
-                            $("#nrHealthFacilitiesWithExternalEvaluations").hide();
                             $('#tblOrgainzationUnits').append('<tr><td>' + columns['healthFacilityName'] + '</td><td>'
                                 + columns['externalPerformed'] + '</td></tr>');
                         }).catch((err) => {
