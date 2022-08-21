@@ -287,14 +287,12 @@
     }
 
     $(document).ready(function () {
-        //console.log(dhis2);
+       
+        $("#notImplementingVBG").hide();
         var date = new Date(dhis2.report.date);
-        //console.log(dhis2.report);
         var orgUnit = dhis2.report.organisationUnit;
         var today = new Date().toLocaleString("pt-PT");
 
-
-        //$("#orgUnit").html(orgUnit.name);
         $("#date").html(date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear());
         $("#today").html(today);
         var fullYear = date.getFullYear();
@@ -368,7 +366,7 @@
 
                                 })
                             $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedBaseLineCount + '</td> <td>' + rows.at(-1).performedBaseLineCount + '</td> <td>' + rows.at(-1).performedBaseLineCountPercentage + '%</span></td> <td>' + rows.at(-1).inTimePerformedBaseLineCount + '</td> <td>' + rows.at(-1).inTimePerformedBaseLineCountPercentage * 100 + '%</td></tr>');
-                        });
+                        }).finally(() => $("#loader").hide());
                     //getReportDetails(json.children, period, count, 3);
                     break;
 
@@ -382,8 +380,10 @@
                                 '%</td> <td>' + columns['realizadasAtempo'] + '</td> <td>'
                                 + columns['percentagemRealizadasAtempo'] + '%</td></tr>');
                         }).catch((err) => {
+                            $("#notImplementingVBG").show();
+                            $("#healthF").html(orgUnit.name);
                             console.error(err);
-                        });
+                        }).finally(() => $("#loader").hide());
                     break;
 
 
@@ -460,7 +460,11 @@
         </thead>
         <tbody id="tblOrgainzationUnits">
             <tr id="loader">
-                <td colspan="6"> A processar os dados ...</td>
+                <td colspan="3"> A processar os dados ...</td>
+            </tr>
+            <tr id="notImplementingVBG">
+                <td colspan="2"> A US <span style="font-weight: bold; font-style:italic;" id="healthF"></span>
+                    Selecionada não implementa o eIMD - VBG</td>
             </tr>
 
         </tbody>
