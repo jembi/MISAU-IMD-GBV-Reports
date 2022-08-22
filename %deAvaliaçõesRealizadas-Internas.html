@@ -20,9 +20,9 @@
     table {
         margin-left: auto;
         margin-right: auto;
-        border-collapse:collapse;
-        table-layout:fixed;
-        width:100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        width: 100%;
     }
 
     .headerDescription {
@@ -31,12 +31,12 @@
     }
 
     .title {
-        text-align: center; 
+        text-align: center;
         font-weight: 500px;
     }
 
     .parameters {
-        text-align: justify; 
+        text-align: justify;
         font-weight: 300px;
     }
 </style>
@@ -60,33 +60,93 @@
         var period = fullYear + quarter;
 
         //Get organisation unit and check the level
-        $.get("../api/organisationUnits/" + orgUnit.id + ".json?fields=id,name,level,children", function (json) {
+        $.get("../api/organisationUnits/" + orgUnit.id + ".json?fields=id,name,level,children[id, name]", function (json) {
+            var levels = ['Províncias', 'Distritos', 'Unidades Sanitárias', 'Unidade Sanitária']
             var level = json.level;
-            if (level == 1) {
-                let count = json.children.length;
-                getReportDetails(json.children, period, count, 1);
-            } else if (level == 2) {
-                let count = json.children.length;
-                getReportDetails(json.children, period, count, 2);
-            } else if (level == 3) {
-                let count = json.children.length;
-                getReportDetails(json.children, period, count, 3);
-            } else if (level == 4) {
-                let validEvaluationsPercentage = 0;
-                $.get("../api/analytics?dimension=dx:yOR81tRBWIw;u7P0opGH3c9;lD2YLTZ8NOe;QYYFkIdTTDY;vA3Y0Bzy4sU;hV52rtgvgEI&dimension=pe:" + period + "&filter=ou:" + orgUnit.id, function (json) {
-                    $("#internal").html(json.rows[1][2]);
-                    $("#validEvaluations").html(json.rows[4][2]);
-                    $("#orgUnit4").html(orgUnit.name);
-                    validEvaluationsPercentage = (parseInt(json.rows[5][2]) / parseInt(json.rows[4][2])) * 100 || 0;
-                    $("#validEvaluationsPercentage").html(validEvaluationsPercentage);
+            switch (level) {
+                case 1:
+                    $("#orgUnitLevel").html(levels[0]);
+                    getReportDetailsNational(json, date).then((rows) => {
+                        rows.slice(0, -1)
+                            .forEach((province) => {
+                                $('#tblOrgainzationUnits').append('<tr><td>' + province.name
+                                    + '</td> <td>' + province.expectedInternalCount + '</td> <td>'
+                                    + province.performedInternalCount + '</td> <td>' + province.performedInternalCountPercentage +
+                                    '%</td> <td>' + province.inTimePerformedInternalCount + '</td> <td>'
+                                    + province.inTimePerformedInternalCountPercentage + '%</td></tr>');
 
-                });
+                            })
+                        $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedInternalCount + '</td> <td>' +
+                            rows.at(-1).performedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCountPercentage +
+                            '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount +
+                            '</td> <td>' + rows.at(-1).inTimePerformedInternalCountPercentage * 100 + '%</td></tr>');
+                    }).finally(() => $("#loader").hide());
+                    break;
+                case 2:
+                    $("#orgUnitLevel").html(levels[1]);
+                    getReportDetailsProvincial(json, date)
+                        .then((rows) => {
+                            rows.slice(0, -1)
+                                .forEach((district) => {
+                                    $('#tblOrgainzationUnits').append('<tr><td>' + district.name
+                                        + '</td> <td>' + district.expectedInternalCount + '</td> <td>'
+                                        + district.performedInternalCount + '</td> <td>'
+                                        + district.performedInternalCountPercentage
+                                        + '%</td> <td>' + district.inTimePerformedInternalCount + '</td> <td>'
+                                        + district.inTimePerformedInternalCountPercentage + '%</td></tr>');
 
-                $('#tblOrgainzationUnits').append('<tr><td><span id="orgUnit4"></span></td><td><span id="internal"></span></td> <td>1</td> <td>100%</td> <td><span id="validEvaluations"></span></td> <td><span id="validEvaluationsPercentage"></span>%</td></tr>');
+                                })
+                            $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedInternalCount
+                                + '</td> <td>' + rows.at(-1).performedInternalCount
+                                + '</td> <td>' + rows.at(-1).performedInternalCountPercentage
+                                + '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount + '</td> <td>'
+                                + rows.at(-1).inTimePerformedInternalCountPercentage * 100 + '%</td></tr>');
+                            //return rows;
+                        }).finally(() => $("#loader").hide());
+                    break;
+
+                case 3:
+                    $("#orgUnitLevel").html(levels[2]);
+
+
+                    getReportDetailsDistrict(json, date)
+                        .then((rows) => {
+                            //console.log(values);
+                            rows.slice(0, -1)
+                                .forEach((columns) => {
+
+                                    $('#tblOrgainzationUnits').append('<tr><td>' + columns['healthFacilityName']
+                                        + '</td><td><span>1</span></td> <td>'
+                                        + columns['internal'] + '</td> <td>' + columns['percentagemInternalRealizada'] +
+                                        '%</td> <td>' + columns['realizadasAtempo'] + '</td> <td>'
+                                        + columns['percentagemRealizadasAtempo'] + '%</td></tr>');
+
+                                })
+                            $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCountPercentage + '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount + '</td> <td>' + rows.at(-1).inTimePerformedInternalCountPercentage * 100 + '%</td></tr>');
+                        }).finally(() => $("#loader").hide());
+                    //getReportDetails(json.children, period, count, 3);
+                    break;
+
+                case 4:
+
+                    $("#orgUnitLevel").html("Unidade Sanitária");
+                    getReportDetailsHF(orgUnit, date).then(
+                        (columns) => {
+                            $('#tblOrgainzationUnits').append('<tr><td>' + columns['healthFacilityName'] + '</td><td><span>1</span></td> <td>'
+                                + columns['internal'] + '</td> <td>' + columns['percentagemInternalRealizada'] +
+                                '%</td> <td>' + columns['realizadasAtempo'] + '</td> <td>'
+                                + columns['percentagemRealizadasAtempo'] + '%</td></tr>');
+                            $("#loader").hide();
+                        }).catch((err) => {
+                            console.error(err);
+                        });
+                    break;
+
 
             }
 
         });
+
         function getQuarter(month) {
             var quarters = ['Janeiro - Março', 'Abril - Junho', 'Julho - Setembro', 'Outubro - Dezembro'];
             if (month == 1 || month == 2 || month == 3) {
@@ -118,90 +178,238 @@
             return printOrgUnitDetails();
         }
 
+        /**
+         * Funtions to fill the columns of the National Level report
+         * @Params:
+         * province
+         * startDate - first day of the report
+        */
 
-        function getReportDetails(orgUnits, period, count, level) {
-            
-            let expectedEvaluationSum = 0;
-            let expectedEvaluationSumPercentage = 0;
-            let internalSum = 0;
-            let validEvaluationsSum = 0;
-            let validEvaluationSumPercentage = 0;
+        function getReportDetailsNational(nation, startDate) {
+            let totals = {
+                expectedInternalCount: 0,
+                performedInternalCount: 0,
+                inTimePerformedInternalCount: 0,
+                performedInternalCountPercentage: 0,
+                inTimePerformedInternalCountPercentage: 0
+            };
 
-            $.each(orgUnits, function (index, value) {
-                const orgUnitDetails = fetch("../api/organisationUnits/" + value.id + ".json?fields=id,name,children")
+            let rows = [];
+
+            let childrens = nation.children.map((nation) => {
+                return fetch("../api/organisationUnits/" + nation.id + ".json?fields=id,name,level,children[id, name]")
                     .then((response) => response.json())
-                    .then((data) => {
-                        return data;
+                    .then((provincialDetails) => {
+                        return getReportDetailsProvincial(provincialDetails, startDate);
                     });
-
-                const printOrgUnitDetails = async () => {
-                    let orgUnitName = "";
-                    let internal = 0;
-                    let validEvaluations = 0;
-                    let validEvaluationsPercentage = 0;
-                    let expectedEvaluations = 0;
-                    let orgUnitCount = 0;
-                    const a = await orgUnitDetails;
-                    $.get("../api/analytics?dimension=dx:yOR81tRBWIw;u7P0opGH3c9;lD2YLTZ8NOe;QYYFkIdTTDY;vA3Y0Bzy4sU;hV52rtgvgEI&dimension=pe:" + period + "&filter=ou:" + value.id, function (json) {
-                        if (Array.isArray(json.rows) && json.rows.length > 0) {
-                            internal = json.rows[1][2];
-                            validEvaluations = json.rows[4][2];
-                            validEvaluationsPercentage = (parseInt(json.rows[5][2]) / parseInt(validEvaluations)) * 100 || 0;
-
-                        }
-                        if ((level == 3) || (level == 2)) {
-                            if (a.children.length > 0) {
-                            orgUnitCount = a.children.length;
-                            expectedEvaluationSum = expectedEvaluationSum + orgUnitCount;
-
-                            } else {
-                                orgUnitCount = 1;
-                                expectedEvaluationSum = expectedEvaluationSum + orgUnitCount; 
-
-                            }
-                            internalSum = parseInt(internalSum) + parseInt(internal);
-                            expectedEvaluationSumPercentage = '100%';
-                            validEvaluationsSum = parseInt(validEvaluationsSum) + parseInt(validEvaluations);
-                            validEvaluationSumPercentage = parseFloat(validEvaluationSumPercentage) + ((parseFloat(validEvaluationsPercentage)) / parseFloat(count));
-                            $("#internalSum").html(internalSum);
-                            $("#expectedEvaluationSum").html(expectedEvaluationSum);
-                            $("#expectedEvaluationSumPercentage").html(expectedEvaluationSumPercentage);
-                            $("#validEvaluationsSum").html(validEvaluationsSum);
-                            $("#validEvaluationSumPercentage").html(validEvaluationSumPercentage);
-                            $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + internal + '</td> <td>' + internal + '</td><td>' + orgUnitCount + '</td> <td>' + internal + '</td> <td>' + validEvaluationsPercentage + '</td> <td>' + validEvaluations + '</td><td>' + validEvaluationsPercentage + '%</td></tr>');
-                        } else{
-                            let sumFacilities = 0;
-                            const orgUnitChildrenDetails = fetch("../api/organisationUnits?fields=id,name,level,children[id,name,level,children[id,name,level]]&filter=parent.id:eq:" + value.id)
-                                .then((response) => response.json())
-                                .then((data) => {
-                                    return data;
-                                });
-                            const printorgUnitChildrenDetails = async () => {
-                                const b = await orgUnitChildrenDetails;
-                                b.organisationUnits.forEach(element => {
-                                    sumFacilities = sumFacilities + element.children.length;
-                                });
-                                orgUnitCount = sumFacilities;
-                                expectedEvaluationSum = expectedEvaluationSum + orgUnitCount;
-                                internalSum = parseInt(internalSum) + parseInt(internal);
-                                expectedEvaluationSumPercentage = '100%';
-                                validEvaluationsSum = parseInt(validEvaluationsSum) + parseInt(validEvaluations);
-                                validEvaluationSumPercentage = parseFloat(validEvaluationSumPercentage) + ((parseFloat(validEvaluationsPercentage)) / parseFloat(count));
-                                $("#internalSum").html(internalSum);
-                                $("#expectedEvaluationSum").html(expectedEvaluationSum);
-                                $("#expectedEvaluationSumPercentage").html(expectedEvaluationSumPercentage);
-                                $("#validEvaluationsSum").html(validEvaluationsSum);
-                                $("#validEvaluationSumPercentage").html(validEvaluationSumPercentage.toFixed(2));
-                                $('#tblOrgainzationUnits').append('<tr><td>' + a.name + '</td><td>' + internal + '</td> <td>' + internal + '</td><td>' + orgUnitCount + '</td> <td>' + internal + '</td> <td>' + validEvaluationsPercentage + '</td> <td>' + validEvaluations + '</td><td>' + validEvaluationsPercentage + '%</td></tr>');
-                            };
-                            printorgUnitChildrenDetails();
-                        }
-                    });
-                };
-                printOrgUnitDetails();
             });
-            $('#tblTotal').append('<tr><td>Total</td><td><span id="internalSum"></span></td> <td><span id="internalSum"></span></td><td><span id="expectedEvaluationSum"></span></td> <td><span id="internalSum"></span></td><td>100%</td> <td><span id="validEvaluationsSum"></span></td> <td><span id="validEvaluationSumPercentage"></span>%</td></tr>');
+
+            return Promise.allSettled(childrens).then((values) => {
+                // console.log(values);
+
+                values.forEach((result) => {
+                    if (result.value) {
+                        let districts = result.value;
+                        let provinceTotals = districts.at(-1);
+
+
+                        totals.expectedInternalCount += provinceTotals.expectedInternalCount;
+                        totals.performedInternalCount += provinceTotals.performedInternalCount;
+                        totals.inTimePerformedInternalCount += provinceTotals.inTimePerformedInternalCount;
+                        rows.push(provinceTotals);
+                    }
+                    else
+                        console.log(result.reason);
+
+                })
+                totals.performedInternalCountPercentage = totals.expectedInternalCount > 0 ? totals.performedInternalCount / totals.expectedInternalCount * 100 : 0;
+                totals.inTimePerformedInternalCountPercentage = totals.performedInternalCount > 0 ? totals.inTimePerformedInternalCount / totals.performedInternalCount * 100 : 0;
+                rows.push(totals);
+
+                return rows;
+
+            });
         }
+
+        /**
+         * Funtions to fill the columns of the Provincial Level report
+         * @Params:
+         * province
+         * startDate - first day of the report
+        */
+        function getReportDetailsProvincial(province, startDate) {
+            let totals = {
+                name: province.name,
+                expectedInternalCount: 0,
+                performedInternalCount: 0,
+                inTimePerformedInternalCount: 0,
+                performedInternalCountPercentage: 0,
+                inTimePerformedInternalCountPercentage: 0
+            };
+
+            let rows = [];
+
+            let childrens = province.children.map((district) => {
+                return fetch("../api/organisationUnits/" + district.id + ".json?fields=id,name,level,children[id, name]")
+                    .then((response) => response.json())
+                    .then((districtDetails) => {
+                        return getReportDetailsDistrict(districtDetails, startDate);
+                    });
+            });
+
+            return Promise.allSettled(childrens).then((values) => {
+                console.log(values);
+
+                values.forEach((result) => {
+                    if (result.value) {
+                        let healthFacilities = result.value;
+                        let districtTotals = healthFacilities.at(-1);
+
+
+                        totals.expectedInternalCount += districtTotals.expectedInternalCount;
+                        totals.performedInternalCount += districtTotals.performedInternalCount;
+                        totals.inTimePerformedInternalCount += districtTotals.inTimePerformedInternalCount;
+                        rows.push(districtTotals);
+                    }
+                    else
+                        console.log(result.reason);
+
+                })
+                totals.performedInternalCountPercentage = totals.expectedInternalCount > 0 ? totals.performedInternalCount / totals.expectedInternalCount * 100 : 0;
+                totals.inTimePerformedInternalCountPercentage = totals.performedInternalCount > 0 ? totals.inTimePerformedInternalCount / totals.performedInternalCount * 100 : 0;
+                rows.push(totals);
+
+                return rows;
+
+            });
+
+
+
+        }
+
+        /**
+         * Funtions to fill the columns of the district Level report
+         * @Params:
+         * district
+         * startDate - first day of the report
+        */
+        function getReportDetailsDistrict(district, startDate) {
+
+            let totals = {
+                name: district.name,
+                expectedInternalCount: 0,
+                performedInternalCount: 0,
+                inTimePerformedInternalCount: 0,
+                performedInternalCountPercentage: 0,
+                inTimePerformedInternalCountPercentage: 0
+            };
+
+            let rows = [];
+
+            let childrens = district.children.map((healthFacility) => {
+                return getReportDetailsHF(healthFacility, startDate);
+            });
+
+            return Promise.allSettled(childrens).then((values) => {
+                console.log(values);
+                values.forEach((result) => {
+                    if (result.value) {
+                        let columns = result.value;
+
+
+                        totals.expectedInternalCount += 1
+                        totals.performedInternalCount += columns['internal'];
+                        totals.inTimePerformedInternalCount += columns['realizadasAtempo'];
+                        rows.push(columns);
+                    }
+                    else
+                        console.log(result.reason);
+
+                })
+                totals.performedInternalCountPercentage = totals.expectedInternalCount > 0 ? totals.performedInternalCount / totals.expectedInternalCount * 100 : 0;
+                totals.inTimePerformedInternalCountPercentage = totals.performedInternalCount > 0 ? totals.inTimePerformedInternalCount / totals.performedInternalCount * 100 : 0;
+                rows.push(totals);
+
+                return rows;
+
+            });
+
+        }
+
+        /**
+         * Funtions to fill the columns of the HF Level report
+         * @return columns
+         * @Params:
+         * healthFacility
+         * startDate - first day of the report
+         * 
+        */
+        function getReportDetailsHF(healthFacility, startDate) {
+            let columns = {};
+            //$("#orgUnitLevel").html("Unidade Sanitária");
+            let validEvaluationsPercentage = 0;
+            let percentageOfEvaluationsPerformed = 0;
+            let percentageOfEvaluationsPerformedSum = 0;
+            const program = "F3ymOKlvuUW";
+            const dataDeAvaliacao = "h0R13fKbayt";
+            const dataDeAvaliacaoStartDate = startDate;
+            const dataDeAvaliacaoEndDate = new Date(dataDeAvaliacaoStartDate);
+            dataDeAvaliacaoEndDate.setDate(dataDeAvaliacaoStartDate.getDate() + 90);
+            const tipoDeAvaliacao = "pJPdby9yw6Q:EQ:Interna";
+            const enrollAnalytics = "../api/analytics/enrollments/query/" + program
+                + "?dimension=ou:" + healthFacility.id
+                + "&dimension=" + dataDeAvaliacao + ":GE:" + dataDeAvaliacaoStartDate.toISOString().substring(0, 10) + ":LE:" + dataDeAvaliacaoEndDate.toISOString().substring(0, 10)
+                + "&startDate=1970&endDate=9999"
+                + "&dimension=" + tipoDeAvaliacao;
+
+            return fetch("../api/organisationUnits/" + healthFacility.id + ".json?fields=id,name,children[id,name,openingDate,programs],openingDate,programs[id]")
+                .then((response) => response.json())
+                .then((orgDetails) => {
+
+                    if (orgDetails.programs.find((p) => p.id === program)) {
+                        return fetch(enrollAnalytics)
+                    }
+                    else
+                        throw new Error("A US não implementa VBG");
+
+                })
+                .then((response) => response.json())
+                .then(function (json) {
+                    columns['healthFacilityName'] = healthFacility.name;
+                    var internal = json.height;
+                    columns['internal'] = internal;
+                    columns['percentagemInternalRealizada'] = json.height * 100;
+                    return fetch("../api/organisationUnits/" + healthFacility.id + ".json?fields=id,name,level,openingDate")
+                })
+                .then((response) => response.json())
+                .then((orgUnitDetails) => {
+                    // Realizadas a tempo
+                    const INTERNAL_DAYS = 30;
+                    const startDate = new Date(orgUnitDetails.openingDate);
+                    const endDate = new Date(orgUnitDetails.openingDate);
+                    endDate.setDate(endDate.getDate() + INTERNAL_DAYS);
+
+                    const enrollAnalyticsR = "../api/analytics/enrollments/query/" + program
+                        + "?dimension=ou:" + healthFacility.id
+                        + "&dimension=" + dataDeAvaliacao + ":GE:" + startDate.toISOString().substring(0, 10) + ":LE:" + endDate.toISOString().substring(0, 10)
+                        + "&startDate=1970&endDate=9999"
+                        + "&dimension=" + tipoDeAvaliacao;
+
+
+                    return fetch(enrollAnalyticsR)
+                }).then((response) => response.json())
+                .then(function (json) {
+                    columns['realizadasAtempo'] = json.height;
+                    if (json.height == 0)
+                        columns['percentagemRealizadasAtempo'] = 0
+                    else
+                        columns['percentagemRealizadasAtempo'] = internal / json.height * 100;
+
+                    return columns;
+
+                });
+        }
+
     });
 
 </script>
@@ -212,21 +420,47 @@
     <header class="report-header">
         <img src="http://nuvem.jembi.org:44981/api/staticContent/logo_front" alt="Emblema">
     </header>
-        <p class="headerDescription">República De Moçambique</p>
-        <p class="headerDescription">Ministério da Saúde</p>
-        <br>
-        <p class="title">Percentagem de US com uma Avaliação Interna Realizada (Taxa de Realização das Avaliações Internas)</p>
-        <hr>
-        <br>
+    <p class="headerDescription">República De Moçambique</p>
+    <p class="headerDescription">Ministério da Saúde</p>
+    <br>
+    <p class="title">Percentagem de US com uma Avaliação Interna Realizada (Taxa de Realização das Avaliações Internas)
+    </p>
+    <hr>
+    <br>
 
-        <p class="parameters"><b>Período de Avaliação:</b>  <span id="reportPeriod"></span> </p>    
+    <p class="parameters"><b>Período de Avaliação:</b> <span id="reportPeriod"></span> </p>
 
     <table class="table">
+        <thead>
+            <tr>
+                <th rowspan="2" id="orgUnitLevel"></th>
+                <th rowspan="2">Avaliações Interna (x)</th>
+                <th rowspan="2">Avaliações Interna (y)</th>
+                <th rowspan="2"> % Avaliações Interna Realizadas (y/x)*100</th>
+                <th colspan="2"> Avaliações Interna Realizadas a Tempo</th>
+            </tr>
+            <tr>
+                <th>Nº (w)</th>
+                <th>%(w/y)*100</th>
+            </tr>
+        </thead>
+        <tbody id="tblOrgainzationUnits">
+            <tr id="loader">
+                <td colspan="6"> A processar os dados ...</td>
+            </tr>
+
+        </tbody>
+        <tfoot id="tblTotal">
+        </tfoot>
+    </table>
+
+    <!-- <table class="table">
         <thead id="tableHead">
             <tr>
-                <th rowspan="2">Província</th>
-                <th rowspan="2">Número de US que Implementam IMD</th>
-                <th rowspan="2">Número de US com Avaliações Internas</th>
+                <th rowspan="2" class="province">Província</th>
+                <th rowspan="2" class="facility">Nível US</th>
+                <th rowspan="2" class="imd">Número de US que Implementam IMD</th>
+                <th rowspan="2" class="internas">Número de US com Avaliações Internas</th>
                 <th rowspan="2">Avaliações Interna Esperadas(x)</th>
                 <th rowspan="2">Avaliações Interna Realizadas(y)</th>
                 <th rowspan="2">% Avaliações Interna Realizadas(y/x * 100)</th>
@@ -242,6 +476,6 @@
         </tbody>
         <tfoot id="tblTotal">
         </tfoot>
-    </table>
-    <p class="parameters"><b>Data de Geração:</b>  <span id="today"></span> </p>
+    </table> -->
+    <p class="parameters"><b>Data de Geração:</b> <span id="today"></span> </p>
 </div>
