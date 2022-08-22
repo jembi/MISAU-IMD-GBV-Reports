@@ -258,7 +258,7 @@
             });
 
             return Promise.allSettled(childrens).then((values) => {
-                console.log(values);
+                // console.log(values);
 
                 values.forEach((result) => {
                     if (result.value) {
@@ -311,7 +311,7 @@
             });
 
             return Promise.allSettled(childrens).then((values) => {
-                console.log(values);
+                // console.log(values);
                 values.forEach((result) => {
                     if (result.value) {
                         let columns = result.value;
