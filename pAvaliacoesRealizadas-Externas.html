@@ -1,0 +1,389 @@
+<style type="text/css" media="screen">
+    /* Put your CSS styling here */
+    thead {
+        background-color: #FFC000;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    tfoot {
+        font-weight: bold;
+    }
+
+    .report-header {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 50px;
+    }
+
+    table {
+        margin-left: auto;
+        margin-right: auto;
+        border-collapse: collapse;
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .headerDescription {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .title {
+        text-align: center;
+        font-weight: 500px;
+    }
+
+    .parameters {
+        text-align: justify;
+        font-weight: 300px;
+    }
+</style>
+
+<script type="text/javascript">
+
+    // Put your javascript functions here 
+
+
+    /**
+     * Funtions to fill the columns of the HF Level report
+     * @return columns
+     * @Params:
+     * healthFacility
+     * startDate - first day of the report
+     * 
+    */
+    function getReportDetailsHF(healthFacility, startDate) {
+        let tablerows = {};
+        const program = "F3ymOKlvuUW";
+        const dataDeAvaliacao = "h0R13fKbayt";
+        const dataDeAvaliacaoStartDate = startDate;
+        const dataDeAvaliacaoEndDate = new Date(dataDeAvaliacaoStartDate);
+        dataDeAvaliacaoEndDate.setDate(dataDeAvaliacaoStartDate.getDate() + 90);
+        const tipoDeAvaliacao = "pJPdby9yw6Q:EQ:Externa";
+        const enrollAnalytics = "../api/analytics/enrollments/query/" + program
+            + "?dimension=ou:" + healthFacility.id
+            + "&dimension=" + dataDeAvaliacao + ":GE:" + dataDeAvaliacaoStartDate.toISOString().substring(0, 10) + ":LE:" + dataDeAvaliacaoEndDate.toISOString().substring(0, 10)
+            + "&startDate=1970&endDate=9999"
+            + "&dimension=" + tipoDeAvaliacao;
+
+        return fetch("../api/organisationUnits/" + healthFacility.id + ".json?fields=id,name,children[id,name,programs],programs[id]")
+            .then((response) => response.json())
+            .then((orgDetails) => {
+
+                if (orgDetails.programs.find((p) => p.id === program)) {
+                    return fetch(enrollAnalytics)
+                }
+                else
+                    throw new Error("A US não implementa VBG");
+
+            })
+            .then((response) => response.json())
+            .then(function (json) {
+                tablerows['healthFacilityName'] = healthFacility.name;
+                tablerows['externalPerformed'] = json.height;
+                return tablerows;
+            });
+    }
+
+    /**
+     * Funtions to fill the columns of the district Level report
+     * @Params:
+     * district
+     * startDate - first day of the report
+    */
+    function getReportDetailsDistrict(district, startDate) {
+
+        let totals = {
+            name: district.name,
+            hfWithExternalEvaluationCount: 0,
+            externalPerformedCount: 0
+        };
+
+        let rows = [];
+
+        let childrens = district.children.map((healthFacility) => {
+            console.log(getReportDetailsHF(healthFacility, startDate));
+            return getReportDetailsHF(healthFacility, startDate);
+        });
+
+        return Promise.allSettled(childrens).then((hFacilities) => {
+            //console.log(hFacilities);
+            hFacilities.forEach((result) => {
+                if (result.value) {
+                    let columns = result.value;
+                    if (columns['externalPerformed'] != 0)
+                        totals.hfWithExternalEvaluationCount += 1;
+
+                    totals.externalPerformedCount += columns['externalPerformed'];
+                    rows.push(columns);
+                }
+                else
+                    console.log(result.reason);
+
+            })
+            rows.push(totals);
+
+            return rows;
+
+        });
+
+    }
+
+
+    /**
+     * Funtions to fill the columns of the Provincial Level report
+     * @Params:
+     * province
+     * startDate - first day of the report
+    */
+    function getReportDetailsProvincial(province, startDate) {
+        let totals = {
+            name: province.name,
+            hfWithExternalEvaluationCount: 0,
+            externalPerformedCount: 0,
+        };
+
+        let rows = [];
+
+        let childrens = province.children.map((district) => {
+            return fetch("../api/organisationUnits/" + district.id + ".json?fields=id,name,level,children[id, name]")
+                .then((response) => response.json())
+                .then((districtDetails) => {
+                    return getReportDetailsDistrict(districtDetails, startDate);
+                });
+        });
+
+        return Promise.allSettled(childrens).then((districts) => {
+            console.log(districts);
+
+            districts.forEach((district) => {
+                if (district.value) {
+                    let healthFacilities = district.value;
+                    let districtTotals = healthFacilities.at(-1);
+
+                    totals.externalPerformedCount += districtTotals.externalPerformedCount;
+                    totals.hfWithExternalEvaluationCount += districtTotals.hfWithExternalEvaluationCount;
+                    rows.push(districtTotals);
+                }
+                else
+                    console.log(district.reason);
+
+            })
+            rows.push(totals);
+
+            return rows;
+
+        });
+
+
+
+    }
+
+    /**
+     * Funtions to fill the columns of the Provincial Level report
+     * @Params:
+     * province
+     * startDate - first day of the report
+    */
+    function getReportDetailsNational(country, startDate) {
+        let totals = {
+            name: country.name,
+            hfWithExternalEvaluationCount: 0,
+            externalPerformedCount: 0,
+        };
+
+        let rows = [];
+
+        let childrens = country.children.map((province) => {
+            return fetch("../api/organisationUnits/" + province.id + ".json?fields=id,name,level,children[id, name]")
+                .then((response) => response.json())
+                .then((provinceDetails) => {
+                    return getReportDetailsProvincial(provinceDetails, startDate);
+                });
+        });
+
+        return Promise.allSettled(childrens).then((provinces) => {
+            console.log(provinces);
+
+            provinces.forEach((province) => {
+                if (province.value) {
+                    let districties = province.value;
+                    let provinceTotals = districties.at(-1);
+
+                    totals.externalPerformedCount += provinceTotals.externalPerformedCount;
+                    totals.hfWithExternalEvaluationCount += provinceTotals.hfWithExternalEvaluationCount;
+                    rows.push(provinceTotals);
+                }
+                else
+                    console.log(province.reason);
+
+            })
+            rows.push(totals);
+
+            return rows;
+
+        });
+
+
+
+    }
+
+
+
+    $(document).ready(function () {
+        $("#notImplementingVBG").hide();
+        var date = new Date(dhis2.report.date);
+        var orgUnit = dhis2.report.organisationUnit;
+        var today = new Date().toLocaleString("pt-PT");
+
+
+        $("#orgUnit").html(orgUnit.name);
+        $("#date").html(date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear());
+        $("#today").html(today);
+        var fullYear = date.getFullYear();
+        var month = date.getMonth() + 1;
+        function getQuarter(month) {
+            var quarters = ['Janeiro - Março', 'Abril - Junho', 'Julho - Setembro', 'Outubro - Dezembro'];
+            if (month == 1 || month == 2 || month == 3) {
+                $("#reportPeriod").html(quarters[0] + " de " + fullYear);
+                return 'Q1';
+            } else if (month == 4 || month == 5 || month == 6) {
+                $("#reportPeriod").html(quarters[1] + " de " + fullYear);
+                return 'Q2';
+            } else if (month == 7 || month == 8 || month == 9) {
+                $("#reportPeriod").html(quarters[2] + " de " + fullYear);
+                return 'Q3';
+            } else if (month == 10 || month == 11 || month == 12) {
+                $("#reportPeriod").html(quarters[3] + " de " + fullYear);
+                return 'Q4';
+            }
+        }
+        var quarter = getQuarter(month);
+        var period = fullYear + quarter;
+
+        //Get organisation unit and check the level
+        $.get("../api/organisationUnits/" + orgUnit.id + ".json?fields=id,name,level,children[id, name]", function (json) {
+            var levels = ['Províncias', 'Distritos', 'Unidades Sanitárias', 'Unidade Sanitária']
+            var level = json.level;
+
+            switch (level) {
+                case 1:
+                    $("#reportLevel").html("<b> Nacional: </b>" + orgUnit.name);
+                    $("#orgUnitLevel").html(levels[0]);
+                    getReportDetailsNational(json, date).then((provinces) => {
+                        provinces.slice(0, -1)
+                            .forEach((province) => {
+                                $('#tblOrgainzationUnits').append('<tr><td>' + province.name
+                                    + '</td> <td>' + province.hfWithExternalEvaluationCount + '</td> <td>'
+                                    + province.externalPerformedCount + '</td></tr>');
+
+                            })
+                            $('#tblTotal').append('<tr><td>Total</td> <td>' + provinces.at(-1).hfWithExternalEvaluationCount
+                                + '</td> <td>' + provinces.at(-1).externalPerformedCount + '</td></tr>');
+                    }).finally(() => $("#loader").hide());
+                    break;
+                case 2:
+                    $("#reportLevel").html("<b>Provincial: </b>" + orgUnit.name);
+                    $("#orgUnitLevel").html(levels[1]);
+                    getReportDetailsProvincial(json, date)
+                        .then((districts) => {
+                            districts.slice(0, -1)
+                                .forEach((district) => {
+                                    $('#tblOrgainzationUnits').append('<tr><td>' + district.name
+                                        + '</td> <td>' + district.hfWithExternalEvaluationCount + '</td> <td>'
+                                        + district.externalPerformedCount + '</td></tr>');
+
+                                })
+                            $('#tblTotal').append('<tr><td>Total</td> <td>' + districts.at(-1).hfWithExternalEvaluationCount
+                                + '</td> <td>' + districts.at(-1).externalPerformedCount + '</td></tr>');
+                            //return rows;
+                        }).finally(() => $("#loader").hide());
+                    break;
+
+                case 3:
+                    $("#reportLevel").html("<b>Distrital: </b>" + orgUnit.name);
+                    $("#orgUnitLevel").html(levels[2]);
+                    $("#nrHealthFacilitiesWithExternalEvaluations").hide();
+                    getReportDetailsDistrict(json, date)
+                        .then((healthFacilities) => {
+                            healthFacilities.slice(0, -1)
+                                .forEach((healthFacility) => {
+                                    $('#tblOrgainzationUnits').append('<tr><td>' + healthFacility['healthFacilityName']
+                                        + '</td><td>' + healthFacility['externalPerformed'] + '</td></tr>');
+
+                                })
+                            $('#tblTotal').append('<tr><td>Total</td> <td>' + healthFacilities.at(-1).externalPerformedCount + '</td></tr>');
+                        }).finally(() => $("#loader").hide());
+
+                    break;
+
+                case 4:
+                $("#reportLevel").html("<b>Unidade Sanitária: </b>" + orgUnit.name);
+                    $("#orgUnitLevel").html("Local");
+                    $("#nrHealthFacilitiesWithExternalEvaluations").hide();
+                    getReportDetailsHF(orgUnit, date).then(
+                        (columns) => {
+                            $('#tblOrgainzationUnits').append('<tr><td>' + columns['healthFacilityName'] + '</td><td>'
+                                + columns['externalPerformed'] + '</td></tr>');
+                        }).catch((err) => {
+                            $("#notImplementingVBG").show();
+                            $("#healthF").html(orgUnit.name);
+                            console.error(err);
+                        }).finally(() => $("#loader").hide());
+                    break;
+
+
+            }
+
+
+        });
+
+    });
+
+</script>
+
+<div>
+
+    <!-- Put your HTML mark-up here -->
+    <header class="report-header">
+        <img src="http://nuvem.jembi.org:44981/api/staticContent/logo_front" alt="Emblema">
+    </header>
+    <p class="headerDescription">República De Moçambique</p>
+    <p class="headerDescription">Ministério da Saúde</p>
+    <br>
+    <p class="title">Percentagem de US com uma Avaliação Externa Realizada (Taxa de Realização das Avaliações Externas)
+    </p>
+    <hr>
+    <br>
+
+    <p class="parameters"><b>Período de Avaliação:</b> <span id="reportPeriod"></span> </p>
+    <p class="parameters"><b>Nivel </b> <span id="reportLevel"></span> </p>
+
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th rowspan="2" id="orgUnitLevel"></th>
+                <th rowspan="2" id="nrHealthFacilitiesWithExternalEvaluations">Número de US com Avaliações Externas</th>
+                <th rowspan="2">Número de Avaliações Externas Realizadas</th>
+            </tr>
+        </thead>
+        <tbody id="tblOrgainzationUnits">
+            <tr id="loader">
+                <td colspan="3"> A processar os dados ...</td>
+            </tr>
+            <tr id="notImplementingVBG">
+                <td colspan="2"> A US <span style="font-weight: bold; font-style:italic;" id="healthF"></span>
+                    Selecionada não implementa o eIMD - VBG</td>
+            </tr>
+
+
+        </tbody>
+        <tfoot id="tblTotal">
+        </tfoot>
+    </table>
+    <p class="parameters"><b>Data de Geração:</b> <span id="today"></span> </p>
+</div>
