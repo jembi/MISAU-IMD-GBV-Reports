@@ -27,12 +27,12 @@
 
     .headerDescription {
         text-align: center;
-        font-weight: bold;
+        text-transform: uppercase;
     }
 
     .title {
         text-align: center;
-        font-weight: 500px;
+        font-weight: bold;
     }
 
     .parameters {
@@ -60,7 +60,7 @@
         const dataDeAvaliacao = "h0R13fKbayt";
         const dataDeAvaliacaoStartDate = startDate;
         const dataDeAvaliacaoEndDate = new Date(dataDeAvaliacaoStartDate);
-        dataDeAvaliacaoEndDate.setDate(dataDeAvaliacaoStartDate.getDate() + 90);
+        dataDeAvaliacaoEndDate.setDate(dataDeAvaliacaoStartDate.getDate() + 91);
         const tipoDeAvaliacao = "pJPdby9yw6Q:EQ:Externa";
         const enrollAnalytics = "../api/analytics/enrollments/query/" + program
             + "?dimension=ou:" + healthFacility.id
@@ -104,12 +104,10 @@
         let rows = [];
 
         let childrens = district.children.map((healthFacility) => {
-            console.log(getReportDetailsHF(healthFacility, startDate));
             return getReportDetailsHF(healthFacility, startDate);
         });
 
         return Promise.allSettled(childrens).then((hFacilities) => {
-            //console.log(hFacilities);
             hFacilities.forEach((result) => {
                 if (result.value) {
                     let columns = result.value;
@@ -156,7 +154,6 @@
         });
 
         return Promise.allSettled(childrens).then((districts) => {
-            console.log(districts);
 
             districts.forEach((district) => {
                 if (district.value) {
@@ -205,8 +202,7 @@
         });
 
         return Promise.allSettled(childrens).then((provinces) => {
-            console.log(provinces);
-
+            
             provinces.forEach((province) => {
                 if (province.value) {
                     let districties = province.value;
@@ -280,8 +276,8 @@
                                     + province.externalPerformedCount + '</td></tr>');
 
                             })
-                            $('#tblTotal').append('<tr><td>Total</td> <td>' + provinces.at(-1).hfWithExternalEvaluationCount
-                                + '</td> <td>' + provinces.at(-1).externalPerformedCount + '</td></tr>');
+                        $('#tblTotal').append('<tr><td>Total</td> <td>' + provinces.at(-1).hfWithExternalEvaluationCount
+                            + '</td> <td>' + provinces.at(-1).externalPerformedCount + '</td></tr>');
                     }).finally(() => $("#loader").hide());
                     break;
                 case 2:
@@ -320,7 +316,7 @@
                     break;
 
                 case 4:
-                $("#reportLevel").html("<b>Unidade Sanitária: </b>" + orgUnit.name);
+                    $("#reportLevel").html("<b>Unidade Sanitária: </b>" + orgUnit.name);
                     $("#orgUnitLevel").html("Local");
                     $("#nrHealthFacilitiesWithExternalEvaluations").hide();
                     getReportDetailsHF(orgUnit, date).then(
@@ -330,7 +326,7 @@
                         }).catch((err) => {
                             $("#notImplementingVBG").show();
                             $("#healthF").html(orgUnit.name);
-                            console.error(err);
+                            //console.error(err);
                         }).finally(() => $("#loader").hide());
                     break;
 
@@ -351,10 +347,14 @@
         <img src="http://nuvem.jembi.org:44981/api/staticContent/logo_front" alt="Emblema">
     </header>
     <p class="headerDescription">República De Moçambique</p>
+    <hr style="border: 1px solid #000; width:100px">
     <p class="headerDescription">Ministério da Saúde</p>
+    <p class="headerDescription">Direcção Nacional de Assistência Médica</p>
     <br>
-    <p class="title">Percentagem de US com uma Avaliação Externa Realizada (Taxa de Realização das Avaliações Externas)
-    </p>
+    <p style="text-align: center; font-size: 15px; font-weight: bold;">INSTRUMENTO ELECTRÓNICO DE MEDIÇÃO DE DESEMPENHO DE SERVIÇOS DE
+        CUIDADOS PÓS VIOLÊNCIA BASEADA NO GÉNERO (e- IMD VBG)</p>
+    <br>
+    <p class="title">Número de Avaliações Externas Realizadas</p>
     <hr>
     <br>
 
