@@ -321,6 +321,9 @@
                         totals.performedInternalCount += columns['internal'];
                         totals.inTimePerformedInternalCount += columns['realizadasAtempo'];
                         rows.push(columns);
+                        $('.imd').hide();
+                        $('.internas').hide();
+
                     }
                     else
                         console.log(result.reason);
@@ -379,6 +382,8 @@
                     var internal = json.height;
                     columns['internal'] = internal;
                     columns['percentagemInternalRealizada'] = json.height * 100;
+                    $('.imd').hide();
+                    $('.internas').hide();
                     return fetch("../api/organisationUnits/" + healthFacility.id + ".json?fields=id,name,level,openingDate")
                 })
                 .then((response) => response.json())
@@ -434,8 +439,10 @@
         <thead>
             <tr>
                 <th rowspan="2" id="orgUnitLevel"></th>
-                <th rowspan="2">Avaliações Interna (x)</th>
-                <th rowspan="2">Avaliações Interna (y)</th>
+                <th rowspan="2" class="imd">Número de US que Implementam IMD</th>
+                <th rowspan="2" class="internas">Número de US com Avaliações Internas</th>
+                <th rowspan="2">Avaliações Interna Esperadas(x)</th>
+                <th rowspan="2">Avaliações Interna Realizadas(y)</th>
                 <th rowspan="2"> % Avaliações Interna Realizadas (y/x)*100</th>
                 <th colspan="2"> Avaliações Interna Realizadas a Tempo</th>
             </tr>
