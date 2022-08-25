@@ -70,13 +70,16 @@
                         rows.slice(0, -1)
                             .forEach((province) => {
                                 $('#tblOrgainzationUnits').append('<tr><td>' + province.name
-                                    + '</td> <td>' + province.expectedInternalCount + '</td> <td>'
+                                    + '</td> <td>' + province.hfImplementingImd + '</td> <td>'
+                                    +  province.hfWithExternalEvaluationCount + '</td> <td>'
+                                    +  province.expectedInternalCount + '</td> <td>'
                                     + province.performedInternalCount + '</td> <td>' + province.performedInternalCountPercentage +
                                     '%</td> <td>' + province.inTimePerformedInternalCount + '</td> <td>'
                                     + province.inTimePerformedInternalCountPercentage + '%</td></tr>');
 
                             })
-                        $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedInternalCount + '</td> <td>' +
+                        $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).hfImplementingImd + '</td> <td>' +
+                            rows.at(-1).hfWithExternalEvaluationCount + '</td> <td>' +  rows.at(-1).expectedInternalCount + '</td> <td>' +
                             rows.at(-1).performedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCountPercentage +
                             '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount +
                             '</td> <td>' + rows.at(-1).inTimePerformedInternalCountPercentage * 100 + '%</td></tr>');
@@ -89,14 +92,18 @@
                             rows.slice(0, -1)
                                 .forEach((district) => {
                                     $('#tblOrgainzationUnits').append('<tr><td>' + district.name
-                                        + '</td> <td>' + district.expectedInternalCount + '</td> <td>'
+                                        + '</td> <td>' + district.hfImplementingImd + '</td> <td>'
+                                        + district.hfWithExternalEvaluationCount + '</td> <td>'
+                                        + district.expectedInternalCount + '</td> <td>'
                                         + district.performedInternalCount + '</td> <td>'
                                         + district.performedInternalCountPercentage
                                         + '%</td> <td>' + district.inTimePerformedInternalCount + '</td> <td>'
                                         + district.inTimePerformedInternalCountPercentage + '%</td></tr>');
 
                                 })
-                            $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedInternalCount
+                            $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).hfImplementingImd
+                                + '</td> <td>' + rows.at(-1).hfWithExternalEvaluationCount
+                                + '</td> <td>' + rows.at(-1).expectedInternalCount
                                 + '</td> <td>' + rows.at(-1).performedInternalCount
                                 + '</td> <td>' + rows.at(-1).performedInternalCountPercentage
                                 + '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount + '</td> <td>'
@@ -122,6 +129,8 @@
                                         + columns['percentagemRealizadasAtempo'] + '%</td></tr>');
 
                                 })
+                                $('.imd').hide();
+                                $('.internas').hide();
                             $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCountPercentage + '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount + '</td> <td>' + rows.at(-1).inTimePerformedInternalCountPercentage * 100 + '%</td></tr>');
                         }).finally(() => $("#loader").hide());
                     //getReportDetails(json.children, period, count, 3);
@@ -137,6 +146,8 @@
                                 '%</td> <td>' + columns['realizadasAtempo'] + '</td> <td>'
                                 + columns['percentagemRealizadasAtempo'] + '%</td></tr>');
                             $("#loader").hide();
+                            $('.imd').hide();
+                            $('.internas').hide();
                         }).catch((err) => {
                             console.error(err);
                         });
@@ -191,7 +202,9 @@
                 performedInternalCount: 0,
                 inTimePerformedInternalCount: 0,
                 performedInternalCountPercentage: 0,
-                inTimePerformedInternalCountPercentage: 0
+                inTimePerformedInternalCountPercentage: 0,
+                hfWithExternalEvaluationCount: 0,
+                hfImplementingImd: 0
             };
 
             let rows = [];
@@ -212,7 +225,8 @@
                         let districts = result.value;
                         let provinceTotals = districts.at(-1);
 
-
+                        totals.hfWithExternalEvaluationCount += provinceTotals.hfWithExternalEvaluationCount;
+                        totals.hfImplementingImd += 1;
                         totals.expectedInternalCount += provinceTotals.expectedInternalCount;
                         totals.performedInternalCount += provinceTotals.performedInternalCount;
                         totals.inTimePerformedInternalCount += provinceTotals.inTimePerformedInternalCount;
@@ -244,7 +258,9 @@
                 performedInternalCount: 0,
                 inTimePerformedInternalCount: 0,
                 performedInternalCountPercentage: 0,
-                inTimePerformedInternalCountPercentage: 0
+                inTimePerformedInternalCountPercentage: 0,
+                hfWithExternalEvaluationCount: 0,
+                hfImplementingImd: 0
             };
 
             let rows = [];
@@ -258,14 +274,15 @@
             });
 
             return Promise.allSettled(childrens).then((values) => {
-                // console.log(values);
+                console.log(values);
 
                 values.forEach((result) => {
                     if (result.value) {
                         let healthFacilities = result.value;
                         let districtTotals = healthFacilities.at(-1);
 
-
+                        totals.hfWithExternalEvaluationCount += districtTotals.hfWithExternalEvaluationCount;
+                        totals.hfImplementingImd += 1;
                         totals.expectedInternalCount += districtTotals.expectedInternalCount;
                         totals.performedInternalCount += districtTotals.performedInternalCount;
                         totals.inTimePerformedInternalCount += districtTotals.inTimePerformedInternalCount;
@@ -301,7 +318,9 @@
                 performedInternalCount: 0,
                 inTimePerformedInternalCount: 0,
                 performedInternalCountPercentage: 0,
-                inTimePerformedInternalCountPercentage: 0
+                inTimePerformedInternalCountPercentage: 0,
+                hfWithExternalEvaluationCount: 0,
+                hfImplementingImd: 0
             };
 
             let rows = [];
@@ -316,13 +335,12 @@
                     if (result.value) {
                         let columns = result.value;
 
-
+                        totals.hfWithExternalEvaluationCount += 1;
+                        totals.hfImplementingImd += 1;
                         totals.expectedInternalCount += 1
                         totals.performedInternalCount += columns['internal'];
                         totals.inTimePerformedInternalCount += columns['realizadasAtempo'];
                         rows.push(columns);
-                        $('.imd').hide();
-                        $('.internas').hide();
 
                     }
                     else
@@ -370,7 +388,7 @@
                 .then((orgDetails) => {
 
                     if (orgDetails.programs.find((p) => p.id === program)) {
-                        return fetch(enrollAnalytics)
+                        return fetch(enrollAnalytics);
                     }
                     else
                         throw new Error("A US não implementa VBG");
@@ -382,8 +400,6 @@
                     var internal = json.height;
                     columns['internal'] = internal;
                     columns['percentagemInternalRealizada'] = json.height * 100;
-                    $('.imd').hide();
-                    $('.internas').hide();
                     return fetch("../api/organisationUnits/" + healthFacility.id + ".json?fields=id,name,level,openingDate")
                 })
                 .then((response) => response.json())
