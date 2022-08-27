@@ -114,7 +114,7 @@
                 if (json.height == 0)
                     columns['percentagemRealizadasAtempo'] = 0
                 else
-                    columns['percentagemRealizadasAtempo'] = baseline / json.height * 100;
+                    columns['percentagemRealizadasAtempo'] = parseInt(baseline / json.height * 100);
 
                 return columns;
 
@@ -164,8 +164,8 @@
                     console.log(result.reason);
 
             })
-            totals.expectedBaseLineCount ==0 ? 0: totals.performedBaseLineCountPercentage = totals.performedBaseLineCount / totals.expectedBaseLineCount * 100;
-            totals.performedBaseLineCount ==0 ? 0: totals.inTimePerformedBaseLineCountPercentage = totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100;
+            totals.expectedBaseLineCount ==0 ? 0: totals.performedBaseLineCountPercentage = parseInt(totals.performedBaseLineCount / totals.expectedBaseLineCount * 100);
+            totals.performedBaseLineCount ==0 ? 0: totals.inTimePerformedBaseLineCountPercentage = parseInt(totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100);
             rows.push(totals);
 
             return rows;
@@ -219,8 +219,8 @@
                     console.log(result.reason);
 
             })
-            totals.expectedBaseLineCount ==0 ? 0: totals.performedBaseLineCountPercentage = totals.performedBaseLineCount / totals.expectedBaseLineCount * 100;
-            totals.performedBaseLineCount ==0 ? 0: totals.inTimePerformedBaseLineCountPercentage = totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100;
+            totals.expectedBaseLineCount ==0 ? 0: totals.performedBaseLineCountPercentage = parseInt(totals.performedBaseLineCount / totals.expectedBaseLineCount * 100);
+            totals.performedBaseLineCount ==0 ? 0: totals.inTimePerformedBaseLineCountPercentage = parseInt(totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100);
             rows.push(totals);
 
             return rows;
@@ -275,8 +275,8 @@
                     console.log(result.reason);
 
             })
-            totals.expectedBaseLineCount ==0 ? 0: totals.performedBaseLineCountPercentage = totals.performedBaseLineCount / totals.expectedBaseLineCount * 100;
-            totals.performedBaseLineCount ==0 ? 0: totals.inTimePerformedBaseLineCountPercentage = totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100;
+            totals.expectedBaseLineCount ==0 ? 0: totals.performedBaseLineCountPercentage = parseInt(totals.performedBaseLineCount / totals.expectedBaseLineCount * 100);
+            totals.performedBaseLineCount ==0 ? 0: totals.inTimePerformedBaseLineCountPercentage = parseInt(totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100);
             rows.push(totals);
 
             return rows;
