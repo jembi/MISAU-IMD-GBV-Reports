@@ -239,8 +239,8 @@
                         console.log(result.reason);
 
                 })
-                totals.performedInternalCountPercentage = totals.expectedInternalCount > 0 ? totals.performedInternalCount / totals.expectedInternalCount * 100 : 0;
-                totals.inTimePerformedInternalCountPercentage = totals.performedInternalCount > 0 ? totals.inTimePerformedInternalCount / totals.performedInternalCount * 100 : 0;
+                totals.performedInternalCountPercentage = totals.expectedInternalCount > 0 ? parseInt(totals.performedInternalCount / totals.expectedInternalCount * 100) : 0;
+                totals.inTimePerformedInternalCountPercentage = totals.performedInternalCount > 0 ? parseInt(totals.inTimePerformedInternalCount / totals.performedInternalCount * 100) : 0;
                 rows.push(totals);
 
                 return rows;
@@ -295,8 +295,8 @@
                         console.log(result.reason);
 
                 })
-                totals.performedInternalCountPercentage = totals.expectedInternalCount > 0 ? totals.performedInternalCount / totals.expectedInternalCount * 100 : 0;
-                totals.inTimePerformedInternalCountPercentage = totals.performedInternalCount > 0 ? totals.inTimePerformedInternalCount / totals.performedInternalCount * 100 : 0;
+                totals.performedInternalCountPercentage = totals.expectedInternalCount > 0 ? parseInt(totals.performedInternalCount / totals.expectedInternalCount * 100) : 0;
+                totals.inTimePerformedInternalCountPercentage = totals.performedInternalCount > 0 ? parseInt(totals.inTimePerformedInternalCount / totals.performedInternalCount * 100) : 0;
                 rows.push(totals);
 
                 return rows;
@@ -350,8 +350,8 @@
                         console.log(result.reason);
 
                 })
-                totals.performedInternalCountPercentage = totals.expectedInternalCount > 0 ? totals.performedInternalCount / totals.expectedInternalCount * 100 : 0;
-                totals.inTimePerformedInternalCountPercentage = totals.performedInternalCount > 0 ? totals.inTimePerformedInternalCount / totals.performedInternalCount * 100 : 0;
+                totals.performedInternalCountPercentage = totals.expectedInternalCount > 0 ? parseInt(totals.performedInternalCount / totals.expectedInternalCount * 100) : 0;
+                totals.inTimePerformedInternalCountPercentage = totals.performedInternalCount > 0 ? parseInt(totals.inTimePerformedInternalCount / totals.performedInternalCount * 100) : 0;
                 rows.push(totals);
 
                 return rows;
@@ -447,11 +447,12 @@
 
     <!-- Put your HTML mark-up here -->
     <header class="report-header">
-        <img src="http://nuvem.jembi.org:44981/api/staticContent/logo_front" alt="Emblema">
+        <img src="https://dhis2.formacao.eimdvbg.org.mz/api/documents/pI3JTlINMP8/data" alt="Emblema">
     </header>
     <p class="headerDescription">República De Moçambique</p>
+    <hr style="border: 1px solid #000; width:100px">
     <p class="headerDescription">Ministério da Saúde</p>
-    <p class="headerDescription">Direcca0 Nacional De Assistencia Medica</p>
+    <p class="headerDescription">Direcção Nacional de Assistência Médica</p>
     <br>
     <p class="title">Instrumento Electrónico De Medição De Desempenho De Serviços De Cuidados Pós Violência Baseada No Género (e- Imd VBG)</p>
     <p class="title">Percentagem de US com uma Avaliação Interna Realizada (Taxa de Realização das Avaliações Internas)
