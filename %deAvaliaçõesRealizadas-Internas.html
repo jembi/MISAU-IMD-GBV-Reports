@@ -380,6 +380,7 @@
             const dataDeAvaliacaoEndDate = new Date(dataDeAvaliacaoStartDate);
             dataDeAvaliacaoEndDate.setDate(dataDeAvaliacaoStartDate.getDate() + 90);
             const tipoDeAvaliacao = "pJPdby9yw6Q:EQ:Interna";
+            const tipoDeAvaliacaoBaseline = "pJPdby9yw6Q:EQ:Linha de Base";
             const enrollAnalytics = "../api/analytics/enrollments/query/" + program
                 + "?dimension=ou:" + healthFacility.id
                 + "&dimension=" + dataDeAvaliacao + ":GE:" + dataDeAvaliacaoStartDate.toISOString().substring(0, 10) + ":LE:" + dataDeAvaliacaoEndDate.toISOString().substring(0, 10)
@@ -413,10 +414,11 @@
                 .then((response) => response.json())
                 .then((orgUnitDetails) => {
                     // Realizadas a tempo
-                    const INTERNAL_DAYS = 30;
+                    const INTERNAL_DAYS = 105;
                     const startDate = new Date(orgUnitDetails.openingDate);
-                    const endDate = new Date(orgUnitDetails.openingDate);
-                    endDate.setDate(endDate.getDate() + INTERNAL_DAYS);
+                    // const endDate = new Date(orgUnitDetails.openingDate);
+                    // endDate.setDate(endDate.getDate() + INTERNAL_DAYS);
+                    const endDate = new Date();
 
                     const enrollAnalyticsR = "../api/analytics/enrollments/query/" + program
                         + "?dimension=ou:" + healthFacility.id
@@ -424,15 +426,24 @@
                         + "&startDate=1970&endDate=9999"
                         + "&dimension=" + tipoDeAvaliacao;
 
+                    const enrollAnalyticsInternal = "../api/analytics/enrollments/query/" + program
+                        + "?dimension=ou:" + healthFacility.id
+                        + "&dimension=" + dataDeAvaliacao + ":GE:" + startDate.toISOString().substring(0, 10) + ":LE:" + endDate.toISOString().substring(0, 10)
+                        + "&startDate=1970&endDate=9999"
+                        + "&dimension=" + tipoDeAvaliacao;
 
-                    return fetch(enrollAnalyticsR)
+                        console.log(enrollAnalyticsInternal);
+
+
+                    return fetch(enrollAnalyticsInternal)
                 }).then((response) => response.json())
                 .then(function (json) {
+                    console.log(json);
                     columns['realizadasAtempo'] = json.height;
                     if (json.height == 0)
                         columns['percentagemRealizadasAtempo'] = 0;
                     else
-                        columns['percentagemRealizadasAtempo'] = internal / json.height * 100;
+                        columns['percentagemRealizadasAtempo'] = 0;//internal / json.height * 100;
 
                     return columns;
 
