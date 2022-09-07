@@ -72,15 +72,15 @@
                             .forEach((province) => {
                                 $('#tblOrgainzationUnits').append('<tr><td>' + province.name
                                     + '</td> <td>' + province.hfImplementingImdCount + '</td> <td>'
-                                    +  province.hfWithExternalEvaluationCount + '</td> <td>'
-                                    +  province.expectedInternalCount + '</td> <td>'
+                                    + province.hfWithExternalEvaluationCount + '</td> <td>'
+                                    + province.expectedInternalCount + '</td> <td>'
                                     + province.performedInternalCount + '</td> <td>' + province.performedInternalCountPercentage +
                                     '%</td> <td>' + province.inTimePerformedInternalCount + '</td> <td>'
                                     + province.inTimePerformedInternalCountPercentage + '%</td></tr>');
 
                             })
                         $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).hfImplementingImdCount + '</td> <td>' +
-                            rows.at(-1).hfWithExternalEvaluationCount + '</td> <td>' +  rows.at(-1).expectedInternalCount + '</td> <td>' +
+                            rows.at(-1).hfWithExternalEvaluationCount + '</td> <td>' + rows.at(-1).expectedInternalCount + '</td> <td>' +
                             rows.at(-1).performedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCountPercentage +
                             '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount +
                             '</td> <td>' + rows.at(-1).inTimePerformedInternalCountPercentage * 100 + '%</td></tr>');
@@ -131,8 +131,8 @@
                                         + columns['percentagemRealizadasAtempo'] + '%</td></tr>');
 
                                 })
-                                $('.imd').hide();
-                                $('.internas').hide();
+                            $('.imd').hide();
+                            $('.internas').hide();
                             $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCountPercentage + '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount + '</td> <td>' + rows.at(-1).inTimePerformedInternalCountPercentage * 100 + '%</td></tr>');
                         }).finally(() => $("#loader").hide());
                     //getReportDetails(json.children, period, count, 3);
@@ -403,6 +403,7 @@
                     columns['healthFacilityName'] = healthFacility.name;
                     var internal = json.height;
                     columns['internal'] = internal;
+                    columns['totalEvaluations'] = json.rows;
                     if (internal > 0) {
                         columns['hfWithExternalEvaluationCount'] = 1;
                     } else {
@@ -418,35 +419,87 @@
                     const startDate = new Date(orgUnitDetails.openingDate);
                     // const endDate = new Date(orgUnitDetails.openingDate);
                     // endDate.setDate(endDate.getDate() + INTERNAL_DAYS);
-                    const endDate = new Date();
+                    // const endDate = new Date(startDate);
 
                     const enrollAnalyticsR = "../api/analytics/enrollments/query/" + program
                         + "?dimension=ou:" + healthFacility.id
-                        + "&dimension=" + dataDeAvaliacao + ":GE:" + startDate.toISOString().substring(0, 10) + ":LE:" + endDate.toISOString().substring(0, 10)
+                        + "&dimension=" + dataDeAvaliacao + ":GE:" + startDate.toISOString().substring(0, 10) + ":LE:" + dataDeAvaliacaoStartDate.toISOString().substring(0, 10)
                         + "&startDate=1970&endDate=9999"
                         + "&dimension=" + tipoDeAvaliacao;
 
                     const enrollAnalyticsInternal = "../api/analytics/enrollments/query/" + program
                         + "?dimension=ou:" + healthFacility.id
-                        + "&dimension=" + dataDeAvaliacao + ":GE:" + startDate.toISOString().substring(0, 10) + ":LE:" + endDate.toISOString().substring(0, 10)
+                        + "&dimension=" + dataDeAvaliacao + ":GE:" + startDate.toISOString().substring(0, 10) + ":LE:" + dataDeAvaliacaoStartDate.toISOString().substring(0, 10)
                         + "&startDate=1970&endDate=9999"
                         + "&dimension=" + tipoDeAvaliacao;
 
-                        console.log(enrollAnalyticsInternal);
+                    // console.log(enrollAnalyticsInternal);
 
 
                     return fetch(enrollAnalyticsInternal)
                 }).then((response) => response.json())
                 .then(function (json) {
-                    console.log(json);
+                    if (json.height > 0) {
+                        columns['lastInternalEvaluation'] = json.rows[json.height-1];
+                    } else {
+                        columns['lastInternalEvaluation'] = null;
+                    }
+                    // columns['realizadasAtempo'] = json.height;
+                    // if (json.height == 0){
+                    //     columns['percentagemRealizadasAtempo'] = 0;
+                    // }else{
+                    //     columns['percentagemRealizadasAtempo'] = 0;//internal / json.height * 100;
+                    // }
+
+                    // const INTERNAL_DAYS = 105;
+                    // const startDate = new Date(orgUnitDetails.openingDate);
+                    // const endDate = new Date();
+
+                    const enrollAnalyticsBaseline = "../api/analytics/enrollments/query/" + program
+                        + "?dimension=ou:" + healthFacility.id
+                        + "&dimension=" + dataDeAvaliacao + ":LE:" + dataDeAvaliacaoStartDate.toISOString().substring(0, 10)
+                        + "&startDate=1970&endDate=9999"
+                        + "&dimension=" + tipoDeAvaliacaoBaseline;
+                    // return columns;
+                    return fetch(enrollAnalyticsBaseline)
+                }).then((response) => response.json())
+                .then(function (json) {
+                    // console.log("*************************");
+                    // console.log(columns['lastInternalEvaluation']);
+                    // console.log("*************************");
+                    // console.log(json.rows[json.height-1]);
+                    columns['lastBaselineEvaluation'] = json.rows[json.height-1];
+                    
+                    let lastEvaluationDate = null;
+
+                    if (columns['lastInternalEvaluation'].length > 0 && columns['lastBaselineEvaluation'].length > 0) {
+                        const internalDate = new Date(columns['lastInternalEvaluation'][10]);
+                        const baselineDate = new Date(columns['lastBaselineEvaluation'][10]);
+
+                        if (internalDate > baselineDate) {
+                            lastEvaluationDate = columns['lastInternalEvaluation'][10];
+                        } else {
+                            lastEvaluationDate = columns['lastBaselineEvaluation'][10];   
+                        }
+                    } else if(columns['lastInternalEvaluation'].length > 0){
+                        lastEvaluationDate = columns['lastInternalEvaluation'][10];
+                    }else if(columns['lastBaselineEvaluation'].length > 0){
+                        lastEvaluationDate = columns['lastBaselineEvaluation'][10];
+                    }
+                    else {
+                        
+                    }
+                    console.log(lastEvaluationDate);
+                    console.log('**********************************');
+                    console.log(columns['totalEvaluations']);
+
                     columns['realizadasAtempo'] = json.height;
-                    if (json.height == 0)
+                    if (json.height == 0){
                         columns['percentagemRealizadasAtempo'] = 0;
-                    else
+                    }else{
                         columns['percentagemRealizadasAtempo'] = 0;//internal / json.height * 100;
-
+                    }
                     return columns;
-
                 });
         }
 
@@ -465,7 +518,8 @@
     <p class="headerDescription">Ministério da Saúde</p>
     <p class="headerDescription">Direcção Nacional de Assistência Médica</p>
     <br>
-    <p class="title">Instrumento Electrónico De Medição De Desempenho De Serviços De Cuidados Pós Violência Baseada No Género (e- Imd VBG)</p>
+    <p class="title">Instrumento Electrónico De Medição De Desempenho De Serviços De Cuidados Pós Violência Baseada No
+        Género (e- Imd VBG)</p>
     <p class="title">Percentagem de US com uma Avaliação Interna Realizada (Taxa de Realização das Avaliações Internas)
     </p>
     <hr>
