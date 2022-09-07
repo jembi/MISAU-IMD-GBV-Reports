@@ -374,6 +374,7 @@
             let validEvaluationsPercentage = 0;
             let percentageOfEvaluationsPerformed = 0;
             let percentageOfEvaluationsPerformedSum = 0;
+            columns['realizadasAtempo'] = 0;
             const program = "F3ymOKlvuUW";
             const dataDeAvaliacao = "h0R13fKbayt";
             const dataDeAvaliacaoStartDate = startDate;
@@ -417,15 +418,6 @@
                     // Realizadas a tempo
                     const INTERNAL_DAYS = 105;
                     const startDate = new Date(orgUnitDetails.openingDate);
-                    // const endDate = new Date(orgUnitDetails.openingDate);
-                    // endDate.setDate(endDate.getDate() + INTERNAL_DAYS);
-                    // const endDate = new Date(startDate);
-
-                    const enrollAnalyticsR = "../api/analytics/enrollments/query/" + program
-                        + "?dimension=ou:" + healthFacility.id
-                        + "&dimension=" + dataDeAvaliacao + ":GE:" + startDate.toISOString().substring(0, 10) + ":LE:" + dataDeAvaliacaoStartDate.toISOString().substring(0, 10)
-                        + "&startDate=1970&endDate=9999"
-                        + "&dimension=" + tipoDeAvaliacao;
 
                     const enrollAnalyticsInternal = "../api/analytics/enrollments/query/" + program
                         + "?dimension=ou:" + healthFacility.id
@@ -433,42 +425,28 @@
                         + "&startDate=1970&endDate=9999"
                         + "&dimension=" + tipoDeAvaliacao;
 
-                    // console.log(enrollAnalyticsInternal);
-
-
                     return fetch(enrollAnalyticsInternal)
                 }).then((response) => response.json())
                 .then(function (json) {
                     if (json.height > 0) {
                         columns['lastInternalEvaluation'] = json.rows[json.height-1];
                     } else {
-                        columns['lastInternalEvaluation'] = null;
+                        columns['lastInternalEvaluation'] = [];
                     }
-                    // columns['realizadasAtempo'] = json.height;
-                    // if (json.height == 0){
-                    //     columns['percentagemRealizadasAtempo'] = 0;
-                    // }else{
-                    //     columns['percentagemRealizadasAtempo'] = 0;//internal / json.height * 100;
-                    // }
-
-                    // const INTERNAL_DAYS = 105;
-                    // const startDate = new Date(orgUnitDetails.openingDate);
-                    // const endDate = new Date();
 
                     const enrollAnalyticsBaseline = "../api/analytics/enrollments/query/" + program
                         + "?dimension=ou:" + healthFacility.id
                         + "&dimension=" + dataDeAvaliacao + ":LE:" + dataDeAvaliacaoStartDate.toISOString().substring(0, 10)
                         + "&startDate=1970&endDate=9999"
                         + "&dimension=" + tipoDeAvaliacaoBaseline;
-                    // return columns;
                     return fetch(enrollAnalyticsBaseline)
                 }).then((response) => response.json())
                 .then(function (json) {
-                    // console.log("*************************");
-                    // console.log(columns['lastInternalEvaluation']);
-                    // console.log("*************************");
-                    // console.log(json.rows[json.height-1]);
-                    columns['lastBaselineEvaluation'] = json.rows[json.height-1];
+                    if (json.height > 0) {
+                        columns['lastBaselineEvaluation'] = json.rows[json.height-1];
+                    }else{
+                        columns['lastBaselineEvaluation'] = [];
+                    }
                     
                     let lastEvaluationDate = null;
 
@@ -489,15 +467,24 @@
                     else {
                         
                     }
-                    console.log(lastEvaluationDate);
-                    console.log('**********************************');
-                    console.log(columns['totalEvaluations']);
 
-                    columns['realizadasAtempo'] = json.height;
-                    if (json.height == 0){
+                    const INTERNAL_DAYS = 105;
+
+                    columns['totalEvaluations'].forEach(element => {
+                        console.log(element[10]);
+                        const date1 = new Date(element[10]);
+                        const date2 = new Date(lastEvaluationDate);
+                        date2.setDate(date2.getDate() + INTERNAL_DAYS);
+
+                        if (date1 <= date2) {
+                            columns['realizadasAtempo'] = columns['realizadasAtempo'] + 1;
+                        }
+                    });
+
+                    if (columns['realizadasAtempo'] == 0){
                         columns['percentagemRealizadasAtempo'] = 0;
                     }else{
-                        columns['percentagemRealizadasAtempo'] = 0;//internal / json.height * 100;
+                        columns['percentagemRealizadasAtempo'] = columns['realizadasAtempo'] / columns['totalEvaluations'].length  * 100;
                     }
                     return columns;
                 });
