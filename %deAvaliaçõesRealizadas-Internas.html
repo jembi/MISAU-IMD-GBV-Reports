@@ -83,7 +83,7 @@
                             rows.at(-1).hfWithExternalEvaluationCount + '</td> <td>' + rows.at(-1).expectedInternalCount + '</td> <td>' +
                             rows.at(-1).performedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCountPercentage +
                             '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount +
-                            '</td> <td>' + rows.at(-1).inTimePerformedInternalCountPercentage * 100 + '%</td></tr>');
+                            '</td> <td>' + rows.at(-1).inTimePerformedInternalCountPercentage + '%</td></tr>');
                     }).finally(() => $("#loaderComplete").hide());
                     break;
                 case 2:
@@ -109,7 +109,7 @@
                                 + '</td> <td>' + rows.at(-1).performedInternalCount
                                 + '</td> <td>' + rows.at(-1).performedInternalCountPercentage
                                 + '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount + '</td> <td>'
-                                + rows.at(-1).inTimePerformedInternalCountPercentage * 100 + '%</td></tr>');
+                                + rows.at(-1).inTimePerformedInternalCountPercentage + '%</td></tr>');
                             //return rows;
                         }).finally(() => $("#loaderComplete").hide());
                     break;
@@ -133,7 +133,7 @@
                                 })
                             $('.imd').hide();
                             $('.internas').hide();
-                            $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCountPercentage + '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount + '</td> <td>' + rows.at(-1).inTimePerformedInternalCountPercentage * 100 + '%</td></tr>');
+                            $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCountPercentage + '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount + '</td> <td>' + rows.at(-1).inTimePerformedInternalCountPercentage + '%</td></tr>');
                         }).finally(() => $("#loader").hide());
                     //getReportDetails(json.children, period, count, 3);
                     break;
