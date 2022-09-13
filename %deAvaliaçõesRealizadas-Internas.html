@@ -72,7 +72,7 @@
                             .forEach((province) => {
                                 $('#tblOrgainzationUnits').append('<tr><td>' + province.name
                                     + '</td> <td>' + province.hfImplementingImdCount + '</td> <td>'
-                                    + province.hfWithExternalEvaluationCount + '</td> <td>'
+                                    + province.hfWithInternalEvaluationCount + '</td> <td>'
                                     + province.expectedInternalCount + '</td> <td>'
                                     + province.performedInternalCount + '</td> <td>' + province.performedInternalCountPercentage +
                                     '%</td> <td>' + province.inTimePerformedInternalCount + '</td> <td>'
@@ -80,7 +80,7 @@
 
                             })
                         $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).hfImplementingImdCount + '</td> <td>' +
-                            rows.at(-1).hfWithExternalEvaluationCount + '</td> <td>' + rows.at(-1).expectedInternalCount + '</td> <td>' +
+                            rows.at(-1).hfWithInternalEvaluationCount + '</td> <td>' + rows.at(-1).expectedInternalCount + '</td> <td>' +
                             rows.at(-1).performedInternalCount + '</td> <td>' + rows.at(-1).performedInternalCountPercentage +
                             '%</span></td> <td>' + rows.at(-1).inTimePerformedInternalCount +
                             '</td> <td>' + rows.at(-1).inTimePerformedInternalCountPercentage + '%</td></tr>');
@@ -95,7 +95,7 @@
                                 .forEach((district) => {
                                     $('#tblOrgainzationUnits').append('<tr><td>' + district.name
                                         + '</td> <td>' + district.hfImplementingImdCount + '</td> <td>'
-                                        + district.hfWithExternalEvaluationCount + '</td> <td>'
+                                        + district.hfWithInternalEvaluationCount + '</td> <td>'
                                         + district.expectedInternalCount + '</td> <td>'
                                         + district.performedInternalCount + '</td> <td>'
                                         + district.performedInternalCountPercentage
@@ -104,7 +104,7 @@
 
                                 })
                             $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).hfImplementingImdCount
-                                + '</td> <td>' + rows.at(-1).hfWithExternalEvaluationCount
+                                + '</td> <td>' + rows.at(-1).hfWithInternalEvaluationCount
                                 + '</td> <td>' + rows.at(-1).expectedInternalCount
                                 + '</td> <td>' + rows.at(-1).performedInternalCount
                                 + '</td> <td>' + rows.at(-1).performedInternalCountPercentage
@@ -206,7 +206,7 @@
                 inTimePerformedInternalCount: 0,
                 performedInternalCountPercentage: 0,
                 inTimePerformedInternalCountPercentage: 0,
-                hfWithExternalEvaluationCount: 0,
+                hfWithInternalEvaluationCount: 0,
                 hfImplementingImdCount: 0
             };
 
@@ -228,7 +228,7 @@
                         let districts = result.value;
                         let provinceTotals = districts.at(-1);
 
-                        totals.hfWithExternalEvaluationCount += provinceTotals.hfWithExternalEvaluationCount;
+                        totals.hfWithInternalEvaluationCount += provinceTotals.hfWithInternalEvaluationCount;
                         totals.hfImplementingImdCount += provinceTotals.hfImplementingImdCount;
                         totals.expectedInternalCount += provinceTotals.expectedInternalCount;
                         totals.performedInternalCount += provinceTotals.performedInternalCount;
@@ -262,7 +262,7 @@
                 inTimePerformedInternalCount: 0,
                 performedInternalCountPercentage: 0,
                 inTimePerformedInternalCountPercentage: 0,
-                hfWithExternalEvaluationCount: 0,
+                hfWithInternalEvaluationCount: 0,
                 hfImplementingImdCount: 0
             };
 
@@ -284,7 +284,7 @@
                         let healthFacilities = result.value;
                         let districtTotals = healthFacilities.at(-1);
 
-                        totals.hfWithExternalEvaluationCount += districtTotals.hfWithExternalEvaluationCount;
+                        totals.hfWithInternalEvaluationCount += districtTotals.hfWithInternalEvaluationCount;
                         totals.hfImplementingImdCount += districtTotals.hfImplementingImdCount;
                         totals.expectedInternalCount += districtTotals.expectedInternalCount;
                         totals.performedInternalCount += districtTotals.performedInternalCount;
@@ -322,7 +322,7 @@
                 inTimePerformedInternalCount: 0,
                 performedInternalCountPercentage: 0,
                 inTimePerformedInternalCountPercentage: 0,
-                hfWithExternalEvaluationCount: 0,
+                hfWithInternalEvaluationCount: 0,
                 hfImplementingImdCount: 0
             };
 
@@ -338,8 +338,8 @@
                     if (result.value) {
                         let columns = result.value;
 
-                        totals.hfWithExternalEvaluationCount += columns['hfWithExternalEvaluationCount'];
-                        totals.hfImplementingImdCount += 1;
+                        totals.hfWithInternalEvaluationCount += columns['hfWithInternalEvaluationCount'];
+                        totals.hfImplementingImdCount += columns['hfImplementingImdCount'];
                         totals.expectedInternalCount += 1
                         totals.performedInternalCount += columns['internal'];
                         totals.inTimePerformedInternalCount += columns['realizadasAtempo'];
@@ -393,6 +393,8 @@
                 .then((orgDetails) => {
 
                     if (orgDetails.programs.find((p) => p.id === program)) {
+                        columns['hfImplementingImdCount'] = 1;
+
                         return fetch(enrollAnalytics);
                     }
                     else
@@ -406,9 +408,9 @@
                     columns['internal'] = internal;
                     columns['totalEvaluations'] = json.rows;
                     if (internal > 0) {
-                        columns['hfWithExternalEvaluationCount'] = 1;
+                        columns['hfWithInternalEvaluationCount'] = 1;
                     } else {
-                        columns['hfWithExternalEvaluationCount'] = 0;
+                        columns['hfWithInternalEvaluationCount'] = 0;
                     }
                     columns['percentagemInternalRealizada'] = json.height * 100;
                     return fetch("../api/organisationUnits/" + healthFacility.id + ".json?fields=id,name,level,openingDate")
