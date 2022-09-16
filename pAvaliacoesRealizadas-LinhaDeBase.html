@@ -76,7 +76,6 @@
         return fetch("../api/organisationUnits/" + healthFacility.id + ".json?fields=id,name,children[id,name,openingDate,programs],openingDate,programs[id]")
             .then((response) => response.json())
             .then((orgDetails) => {
-
                 if (orgDetails.programs.find((p) => p.id === program)) {
                     return fetch(enrollAnalytics)
                 }
@@ -86,8 +85,9 @@
             })
             .then((response) => response.json())
             .then(function (json) {
-                columns['healthFacilityName'] = healthFacility.name;
                 var baseline = json.height;
+
+                columns['healthFacilityName'] = healthFacility.name;
                 columns['baseline'] = baseline;
                 columns['percentagemLinhaDeBaseRealizada'] = json.height * 100;
                 return fetch("../api/organisationUnits/" + healthFacility.id + ".json?fields=id,name,level,openingDate")
@@ -111,13 +111,20 @@
             }).then((response) => response.json())
             .then(function (json) {
                 columns['realizadasAtempo'] = json.height;
-                if (json.height == 0)
+        
+            }).then(function (json) {
+                return fetch(enrollAnalytics)
+            })
+            .then((response) => response.json())
+            .then(function (json) {
+                var baseline = json.height;     
+                 if (columns['realizadasAtempo'] == 0)
                     columns['percentagemRealizadasAtempo'] = 0
                 else
-                    columns['percentagemRealizadasAtempo'] = parseInt(baseline / json.height * 100);
+                    columns['percentagemRealizadasAtempo'] = parseInt((baseline / columns['realizadasAtempo']) * 100);
 
                 return columns;
-
+         
             });
 
 
@@ -149,11 +156,9 @@
         });
 
         return Promise.allSettled(childrens).then((values) => {
-            console.log(values);
             values.forEach((result) => {
                 if (result.value) {
                     let columns = result.value;
-
 
                     totals.expectedBaseLineCount += 1
                     totals.performedBaseLineCount += columns['baseline'];
@@ -202,8 +207,6 @@
         });
 
         return Promise.allSettled(childrens).then((values) => {
-            console.log(values);
-
             values.forEach((result) => {
                 if (result.value) {
                     let healthFacilities = result.value;
@@ -255,8 +258,6 @@
                 .then((response) => response.json())
                 .then(({ organisationUnits }) => [province.name, organisationUnits]);
         });
-
-        const healthFacilityMap = new Map();
 
         return Promise.allSettled(childrens)
             .then((values) => {
@@ -367,7 +368,6 @@
 
         $("#notImplementingVBG").hide();
         var date = new Date();
-        console.log(date);
         var orgUnit = dhis2.report.organisationUnit;
         var today = new Date().toLocaleString("pt-PT");
 
@@ -399,7 +399,7 @@
                         $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedBaseLineCount + '</td> <td>' +
                             rows.at(-1).performedBaseLineCount + '</td> <td>' + rows.at(-1).performedBaseLineCountPercentage +
                             '%</span></td> <td>' + rows.at(-1).inTimePerformedBaseLineCount +
-                            '</td> <td>' + rows.at(-1).inTimePerformedBaseLineCountPercentage * 100 + '%</td></tr>');
+                            '</td> <td>' + rows.at(-1).inTimePerformedBaseLineCountPercentage + '%</td></tr>');
                     }).finally(() => $("#loader").hide());
                     break;
                 case 2:
@@ -421,8 +421,7 @@
                                 + '</td> <td>' + rows.at(-1).performedBaseLineCount
                                 + '</td> <td>' + rows.at(-1).performedBaseLineCountPercentage
                                 + '%</span></td> <td>' + rows.at(-1).inTimePerformedBaseLineCount + '</td> <td>'
-                                + rows.at(-1).inTimePerformedBaseLineCountPercentage * 100 + '%</td></tr>');
-                            //return rows;
+                                + rows.at(-1).inTimePerformedBaseLineCountPercentage + '%</td></tr>');
                         }).finally(() => $("#loader").hide());
                     break;
 
@@ -433,10 +432,8 @@
 
                     getReportDetailsDistrict(json, date)
                         .then((rows) => {
-                            //console.log(values);
                             rows.slice(0, -1)
                                 .forEach((columns) => {
-
                                     $('#tblOrgainzationUnits').append('<tr><td>' + columns['healthFacilityName']
                                         + '</td><td><span>1</span></td> <td>'
                                         + columns['baseline'] + '</td> <td>' + columns['percentagemLinhaDeBaseRealizada'] +
@@ -444,7 +441,7 @@
                                         + columns['percentagemRealizadasAtempo'] + '%</td></tr>');
 
                                 })
-                            $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedBaseLineCount + '</td> <td>' + rows.at(-1).performedBaseLineCount + '</td> <td>' + rows.at(-1).performedBaseLineCountPercentage + '%</span></td> <td>' + rows.at(-1).inTimePerformedBaseLineCount + '</td> <td>' + rows.at(-1).inTimePerformedBaseLineCountPercentage * 100 + '%</td></tr>');
+                            $('#tblTotal').append('<tr><td>Total</td> <td>' + rows.at(-1).expectedBaseLineCount + '</td> <td>' + rows.at(-1).performedBaseLineCount + '</td> <td>' + rows.at(-1).performedBaseLineCountPercentage + '%</span></td> <td>' + rows.at(-1).inTimePerformedBaseLineCount + '</td> <td>' + rows.at(-1).inTimePerformedBaseLineCountPercentage + '%</td></tr>');
                         }).finally(() => $("#loader").hide());
                     break;
 
@@ -493,7 +490,7 @@
 
     <!-- Put your HTML mark-up here -->
     <header class="report-header">
-        <img src="https://dhis2.formacao.eimdvbg.org.mz/api/documents/pI3JTlINMP8/data" alt="Emblema">
+        <img src="http://nuvem.jembi.org:44981/api/staticContent/logo_front" alt="Emblema">
     </header>
     <p class="headerDescription">República De Moçambique</p>
     <hr style="border: 1px solid #000; width: 100px ;">
