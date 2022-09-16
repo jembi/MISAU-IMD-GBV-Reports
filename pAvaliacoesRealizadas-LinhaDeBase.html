@@ -27,7 +27,7 @@
 
     .headerDescription {
         text-align: center;
-        margin:0px;
+        margin: 0px;
     }
 
     .title {
@@ -43,18 +43,18 @@
 
 <script type="text/javascript">
 
-    const IMD_STARTDATE = new Date(2021,03,01,0,0,0,0);
+    const IMD_STARTDATE = new Date(2021, 03, 01, 0, 0, 0, 0);
 
 
     // Put your javascript functions here
 
     /**
-     * Funtions to fill the columns of the HF Level report
+     * Get the columns of the HF Level report
      * @return columns
      * @Params:
      * healthFacility
      * startDate - first day of the report
-     * 
+     *
     */
     function getReportDetailsHF(healthFacility, date) {
         let columns = {};
@@ -133,7 +133,7 @@
     }
 
     /**
-     * Funtions to fill the columns of the district Level report
+     * Get the columns of the district Level report
      * @Params:
      * district
      * startDate - first day of the report
@@ -181,7 +181,7 @@
 
 
     /**
-     * Funtions to fill the columns of the Provincial Level report
+     * Get the columns of the Provincial Level report
      * @Params:
      * province
      * startDate - first day of the report
@@ -222,8 +222,8 @@
                     console.log(result.reason);
 
             })
-            totals.expectedBaseLineCount ==0 ? 0: totals.performedBaseLineCountPercentage = parseInt(totals.performedBaseLineCount / totals.expectedBaseLineCount * 100);
-            totals.performedBaseLineCount ==0 ? 0: totals.inTimePerformedBaseLineCountPercentage = parseInt(totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100);
+            totals.expectedBaseLineCount == 0 ? 0 : totals.performedBaseLineCountPercentage = parseInt(totals.performedBaseLineCount / totals.expectedBaseLineCount * 100);
+            totals.performedBaseLineCount == 0 ? 0 : totals.inTimePerformedBaseLineCountPercentage = parseInt(totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100);
             rows.push(totals);
 
             return rows;
@@ -235,13 +235,13 @@
     }
 
     /**
-     * Funtions to fill the columns of the National Level report
+     * Get the columns of the National Level report
      * @Params:
      * province
-     * startDate - first day of the report
+     * endDate - final day of the report
     */
 
-    function getReportDetailsNational(nation, startDate) {
+    function getReportDetailsNational(nation, endDate) {
         let totals = {
             expectedBaseLineCount: 0,
             performedBaseLineCount: 0,
@@ -250,39 +250,115 @@
             inTimePerformedBaseLineCountPercentage: 0
         };
 
+
         let rows = [];
 
-        let childrens = nation.children.map((nation) => {
-            return fetch("../api/organisationUnits/" + nation.id + ".json?fields=id,name,level,children[id, name]")
+        let childrens = nation.children.map((province) => {
+            return fetch("../api/organisationUnits/" + province.id + ".json?fields=id,name,level&level=2&paging=false")
                 .then((response) => response.json())
-                .then((provincialDetails) => {
-                    return getReportDetailsProvincial(provincialDetails, startDate);
-                });
+                .then(({ organisationUnits }) => [province.name, organisationUnits]);
         });
 
-        return Promise.allSettled(childrens).then((values) => {
-            values.forEach((result) => {
-                if (result.value) {
-                    let districts = result.value;
-                    let provinceTotals = districts.at(-1);
+        return Promise.allSettled(childrens)
+            .then((values) => {
 
-
-                    totals.expectedBaseLineCount += provinceTotals.expectedBaseLineCount;
-                    totals.performedBaseLineCount += provinceTotals.performedBaseLineCount;
-                    totals.inTimePerformedBaseLineCount += provinceTotals.inTimePerformedBaseLineCount;
-                    rows.push(provinceTotals);
-                }
-                else
-                    console.log(result.reason);
+                values.forEach(v => {
+                    if (v.status === "fulfilled") {
+                        const [provinceNAme, healthFacilities] = v.value;
+                        healthFacilityMap.set(provinceNAme, healthFacilities);
+                    } else {
+                        console.error(`Erro ao carregar provincia: ${v.reason}`);
+                    }
+                });
 
             })
-            totals.expectedBaseLineCount ==0 ? 0: totals.performedBaseLineCountPercentage = parseInt(totals.performedBaseLineCount / totals.expectedBaseLineCount * 100);
-            totals.performedBaseLineCount ==0 ? 0: totals.inTimePerformedBaseLineCountPercentage = parseInt(totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100);
-            rows.push(totals);
+            .then(() => {
 
-            return rows;
+                const program = "F3ymOKlvuUW";
+                const dataDeAvaliacao = "h0R13fKbayt";
+                const dataDeAvaliacaoStartDate = IMD_STARTDATE;
+                const dataDeAvaliacaoEndDate = endDate;
+                const tipoDeAvaliacao = "pJPdby9yw6Q:EQ:Linha de Base";
+                const enrollAnalytics = "../api/analytics/enrollments/query/" + program
+                    + "?dimension=ou:" + "LEVEL-2"
+                    + "&dimension=" + dataDeAvaliacao + ":GE:" + dataDeAvaliacaoStartDate.toISOString().substring(0, 10) + ":LE:" + dataDeAvaliacaoEndDate.toISOString().substring(0, 10)
+                    + "&startDate=1970&endDate=9999"
+                    + "&dimension=" + tipoDeAvaliacao;
 
-        });
+                return fetch(enrollAnalytics);
+
+                // TODO fetch enrollAnalytics for realizadas a tempo.
+
+            })
+            .then((response) => response.json())
+            .then((json) => {
+
+                const inverseMap = new Map();
+                for (const [province, hfs] of healthFacilityMap) {
+                    for (const hf of hfs) {
+                        inverseMap.set(hf.name, province);
+                    }
+                }
+
+                const perProvinceTotals = new Map(Array.from(healthFacilityMap, ([province, hfs]) => {
+                    return [province, {
+                        expectedBaseLineCount: hfs.length,
+                        performedBaseLineCount: 0,
+                        inTimePerformedBaseLineCount: 0,
+                        performedBaseLineCountPercentage: 0,
+                        inTimePerformedBaseLineCountPercentage: 0
+                    }];
+                }));
+
+                const nameIndex = json.headers.findIndex((h) => h.name === "ouname");
+                for (const row of json.rows) {
+                    const hf = row[nameIndex];
+                    const province = inverseMap.get(hf);
+                    const current = perProvinceTotals.get(province);
+                    current.performedBaseLineCount += 1;
+                }
+
+                const totals = {
+                    expectedBaseLineCount: 0,
+                    performedBaseLineCount: 0,
+                    inTimePerformedBaseLineCount: 0,
+                    performedBaseLineCountPercentage: 0,
+                    inTimePerformedBaseLineCountPercentage: 0
+                }
+                const rows = [];
+                for (const [province, counts] of perProvinceTotals) {
+
+                    totals.expectedBaseLineCount += counts.expectedBaseLineCount;
+                    totals.performedBaseLineCount += counts.performedBaseLineCount;
+                    totals.inTimePerformedBaseLineCount += counts.inTimePerformedBaseLineCount;
+
+
+                    if (counts.expectedBaseLineCount !== 0) {
+                        counts.performedBaseLineCountPercentage = parseInt(counts.performedBaseLineCount / counts.expectedBaseLineCount * 100);
+                    }
+
+
+                    if (counts.performedBaseLineCount !== 0) {
+                        counts.inTimePerformedBaseLineCountPercentage = parseInt(counts.inTimePerformedBaseLineCount / counts.performedBaseLineCount * 100);
+                    }
+
+                    rows.push({ name: province, ...counts });
+                }
+
+                if (totals.expectedBaseLineCount !== 0) {
+                    totals.performedBaseLineCountPercentage = parseInt(totals.performedBaseLineCount / totals.expectedBaseLineCount * 100);
+                }
+
+
+                if (totals.performedBaseLineCount !== 0) {
+                    totals.inTimePerformedBaseLineCountPercentage = parseInt(totals.inTimePerformedBaseLineCount / totals.performedBaseLineCount * 100);
+                }
+
+                rows.push(totals);
+
+                return rows;
+
+            });
 
 
 
@@ -299,8 +375,8 @@
         $("#today").html(today);
         var fullYear = date.getFullYear();
         var month = date.getMonth() + 1;
-        $("#reportPeriod").html(IMD_STARTDATE.toLocaleDateString("pt-PT") +" - " + date.toLocaleDateString("pt-PT"));
-        
+        $("#reportPeriod").html(IMD_STARTDATE.toLocaleDateString("pt-PT") + " - " + date.toLocaleDateString("pt-PT"));
+
 
         //Get organisation unit and check the level
         $.get("../api/organisationUnits/" + orgUnit.id + ".json?fields=id,name,level,children[id, name]", function (json) {
@@ -390,7 +466,7 @@
 
         });
 
-        
+
 
         function getOrgUnit(orgUnitId) {
 
@@ -421,7 +497,8 @@
     <p class="headerDescription">Ministério da Saúde</p>
     <p class="headerDescription">Direcção Nacional de Assistência Médica</p>
     <br>
-    <p style="text-align: center; font-size: 15px; font-weight: bold;">INSTRUMENTO ELECTRÓNICO DE MEDIÇÃO DE DESEMPENHO DE SERVIÇOS DE
+    <p style="text-align: center; font-size: 15px; font-weight: bold;">INSTRUMENTO ELECTRÓNICO DE MEDIÇÃO DE DESEMPENHO
+        DE SERVIÇOS DE
         CUIDADOS PÓS VIOLÊNCIA BASEADA NO GÉNERO (e- IMD VBG)</p>
     <br>
     <p class="title">Número de Avaliações Linha de Base Realizadas</p>
